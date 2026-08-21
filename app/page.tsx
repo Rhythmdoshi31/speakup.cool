@@ -1,69 +1,294 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+
+import HomeGradient from "../components/home/gradient";
+
+import Navbar from "../components/home/Navbar";
+import ModeSelector from "../components/home/ModeSelector";
+import CategorySelector from "../components/home/CategorySelector";
+import TopicDisplay from "../components/home/TopicDisplay";
+import SpinButton from "../components/home/SpinButton";
+import ActionButtons from "../components/home/ActionButtons";
+import SettingsModal from "../components/home/SettingsModal";
+import TimerScreen from "../components/home/TimerScreen";
+import DebateSideSelector from "../components/home/DebateSideSelector";
+
+import {
+  getRandomTopic,
+  topics,
+  type Category,
+  type Mode,
+} from "../data/topics";
+
+type TimerScreenProps = {
+  topic: string;
+  initialTime?: number;
+  onExit: () => void;
+};
 
 export default function Home() {
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "SpeakUp",
+    url: "https://speakup.cool",
+    description:
+      "A speaking practice tool for debates, impromptu speaking, deep research, and persuasion.",
+    applicationCategory: "EducationalApplication",
+    operatingSystem: "Web",
+    author: {
+      "@type": "Person",
+      name: "Rhythm Doshi",
+      url: "https://rhythmdoshi.xyz",
+    },
+  };
+
+  const [selectedMode, setSelectedMode] =
+    useState<Mode>("offTheCuff");
+
+  const [selectedCategory, setSelectedCategory] =
+    useState<Category>("general");
+
+    const [currentTopic, setCurrentTopic] = useState(
+      topics.offTheCuff.general[0],
+    );
+
+    useEffect(() => {
+      setCurrentTopic(
+        getRandomTopic("offTheCuff", "general"),
+      );
+    }, []);
+
+  const [spinningTopic, setSpinningTopic] = useState<string | null>(null);
+
+  const [isSpinning, setIsSpinning] = useState(false);
+
+  const [isTimerActive, setIsTimerActive] = useState(false);
+
+  const [showSettings, setShowSettings] = useState(false);
+
+  const [speechTime, setSpeechTime] = useState(1);
+
+  const [researchTime, setResearchTime] = useState(5);
+
+  const [timerDuration, setTimerDuration] = useState(60);
+
+  const [timerType, setTimerType] =
+    useState<"speech" | "research">("speech");
+
+  const [debateSide, setDebateSide] = useState<"for" | "against">("for");
+
+  const currentTopics =
+    topics[selectedMode][selectedCategory];
+
+    function changeMode(mode: Mode) {
+      // Cancel any active spin
+      setIsSpinning(false);
+      setSpinningTopic(null);
+    
+      const category = "general";
+    
+      setSelectedMode(mode);
+      setSelectedCategory(category);
+    
+      const nextTopic = getRandomTopic(
+        mode,
+        category,
+        currentTopic,
+      );
+    
+      setCurrentTopic(nextTopic);
+    }
+
+    function changeCategory(category: Category) {
+      // Cancel any active spin
+      setIsSpinning(false);
+      setSpinningTopic(null);
+    
+      setSelectedCategory(category);
+    
+      const nextTopic = getRandomTopic(
+        selectedMode,
+        category,
+        currentTopic,
+      );
+    
+      setCurrentTopic(nextTopic);
+    }
+
+  function startSpin() {
+    if (isSpinning) return;
+
+    const nextTopic = getRandomTopic(
+      selectedMode,
+      selectedCategory,
+      currentTopic,
+    );
+
+    setSpinningTopic(nextTopic);
+    setIsSpinning(true);
+  }
+
+  function finishSpin() {
+    if (spinningTopic) {
+      setCurrentTopic(spinningTopic);
+      setSpinningTopic(null);
+    }
+
+    setIsSpinning(false);
+  }
+
+  function startTimer() {
+    setTimerType("speech");
+    setTimerDuration(speechTime * 60);
+    setIsTimerActive(true);
+  }
+
+  function startResearch() {
+    setTimerType("research");
+    setTimerDuration(researchTime * 60);
+    setIsTimerActive(true);
+  }
+
+  function startSpeechFromResearch() {
+    setTimerType("speech");
+    setTimerDuration(speechTime * 60);
+  }
+
+  function exitTimer() {
+    setIsTimerActive(false);
+  }
+
+  function saveSettings(
+    newSpeechTime: number,
+    newResearchTime: number,
+  ) {
+    setSpeechTime(newSpeechTime);
+    setResearchTime(newResearchTime);
+    setShowSettings(false);
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+    <main className="relative min-h-screen w-full overflow-hidden">
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd),
+        }}
+      />
+
+      {/* ONE gradient instance — never unmounts */}
+      <HomeGradient />
+
+      <a
+        href="https://rhythmdoshi.xyz"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="
+    fixed
+    bottom-6
+    right-6
+    z-50
+    text-sm
+    font-medium
+    tracking-wide
+    text-white/55
+    drop-shadow-[0_1px_8px_rgba(0,0,0,0.4)]
+    transition-all
+    duration-200
+    hover:text-white
+    hover:-translate-y-0.5
+  "
+      >
+        Made by{" "}
+        <span className="text-white/95 underline underline-offset-2">
+          Rhythm Doshi
+        </span>{" "}
+        ↗
+      </a>
+
+      {/* Home UI */}
+      <div className="relative z-10 flex min-h-screen w-full flex-col items-center px-5 pb-10">
+        <Navbar />
+
+        {/* Everything below navbar disappears during timer */}
+        <div
+          className={`pt-5 flex w-full flex-1 flex-col items-center transition-opacity duration-300 ${isTimerActive
+            ? "pointer-events-none invisible opacity-0"
+            : "visible opacity-100"
+            }`}
+        >
+          <section className="flex w-full max-w-6xl flex-1 flex-col items-center text-center">
+
+            <ModeSelector
+              selectedMode={selectedMode}
+              onModeChange={changeMode}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+            <CategorySelector
+              selectedCategory={selectedCategory}
+              onCategoryChange={changeCategory}
+            />
+
+            <div className="flex flex-1 flex-col items-center justify-center pb-12 pt-8">
+              <TopicDisplay
+                topic={currentTopic}
+                finalTopic={spinningTopic}
+                topics={currentTopics}
+                isSpinning={isSpinning}
+                onSpinComplete={finishSpin}
+              />
+
+              {selectedMode === "debate" && (
+                <DebateSideSelector
+                  selectedSide={debateSide}
+                  onSideChange={setDebateSide}
+                />
+              )}
+
+              <SpinButton
+                isSpinning={isSpinning}
+                onSpin={startSpin}
+              />
+
+              <ActionButtons
+                selectedMode={selectedMode}
+                speechTime={speechTime}
+                researchTime={researchTime}
+                onStartTimer={startTimer}
+                onStartResearch={startResearch}
+                onSettings={() => setShowSettings(true)}
+              />
+            </div>
+
+          </section>
         </div>
-      </main>
-    </div>
+      </div>
+
+      {/* Timer */}
+      {isTimerActive && (
+        <TimerScreen
+          topic={currentTopic}
+          initialTime={timerDuration}
+          type={timerType}
+          speechTime={speechTime}
+          debateSide={debateSide}
+          isDebate={selectedMode === "debate"}
+          onExit={exitTimer}
+          onStartSpeech={startSpeechFromResearch}
+        />
+      )}
+
+      <SettingsModal
+        open={showSettings}
+        speechTime={speechTime}
+        researchTime={researchTime}
+        onSave={saveSettings}
+        onClose={() => setShowSettings(false)}
+      />
+    </main>
   );
 }
