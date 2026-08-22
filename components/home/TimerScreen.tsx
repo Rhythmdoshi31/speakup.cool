@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Pause,
   Play,
@@ -22,6 +22,9 @@ type TimerScreenProps = {
   isDebate: boolean;
   onExit: () => void;
   onStartSpeech?: () => void;
+  onExtendResearch?: () => void;
+  researchExtension?: number;
+  isSoundMuted: boolean;
 };
 
 export default function TimerScreen({
@@ -33,37 +36,69 @@ export default function TimerScreen({
   isDebate,
   onExit,
   onStartSpeech,
+  onExtendResearch,
+  researchExtension,
+  isSoundMuted,
 }: TimerScreenProps) {
 
   const [timeLeft, setTimeLeft] = useState(initialTime ?? 60);
 
   const [isPaused, setIsPaused] = useState(false);
+  
+  const timerAudio = useRef<HTMLAudioElement | null>(null);
 
+  useEffect(() => {
+    timerAudio.current = new Audio("/timer.mp3");
+    timerAudio.current.preload = "auto";
+  
+    return () => {
+      timerAudio.current?.pause();
+      timerAudio.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isSoundMuted) return;
+  
+    // Start the sound when 5 seconds remain.
+    if (timeLeft !== 5) return;
+  
+    const audio = timerAudio.current;
+  
+    if (!audio) return;
+  
+    audio.currentTime = 0;
+  
+    audio.play().catch(() => {
+      // Browser blocked audio playback.
+    });
+  }, [timeLeft, isSoundMuted]);
+  
   useEffect(() => {
     setTimeLeft(initialTime ?? 60);
     setIsPaused(false);
-  }, [initialTime, type]);
-
+  }, [initialTime, type, researchExtension]);
+  
   /*
-   * Research starts immediately.
-   * Speech also starts immediately when we enter it.
-   */
-  useEffect(() => {
-    if (isPaused || timeLeft <= 0) {
-      return;
+  * Research starts immediately.
+  * Speech also starts immediately when we enter it.
+  */
+ useEffect(() => {
+   if (isPaused || timeLeft <= 0) {
+     return;
     }
-
+    
     const interval = window.setInterval(() => {
       setTimeLeft((previousTime) => {
         if (previousTime <= 1) {
           setIsPaused(true);
           return 0;
         }
-
+        
         return previousTime - 1;
       });
     }, 1000);
-
+    
     return () => {
       window.clearInterval(interval);
     };
@@ -71,20 +106,20 @@ export default function TimerScreen({
 
   function togglePause() {
     if (timeLeft <= 0) return;
-
+    
     setIsPaused((previous) => !previous);
   }
-
+  
   function resetTimer() {
     setTimeLeft(initialTime ?? 60);
-
+    
     // Reset always pauses.
     setIsPaused(true);
   }
-
+  
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
-
+  
   const formattedTime = `${minutes
     .toString()
     .padStart(2, "0")}:${seconds
@@ -113,42 +148,79 @@ export default function TimerScreen({
             Research Done
           </p>
 
-          {/* Next */}
+          {/* Research actions */}
+          <div className="mt-6 flex items-end justify-center gap-3">
 
-          <p className="mt-12 text-sm text-white/45">
-            Up next: {speechTime} min to speak
-          </p>
+            {/* Ready to Speak — LEFT */}
+            <div className="flex flex-col items-center">
+              <p className="mb-2 text-xs text-transparent">
+                Need more time?
+              </p>
 
-          {/* Continue */}
+              <button
+                type="button"
+                onClick={onStartSpeech}
+                className="
+      flex
+      items-center
+      gap-2
+      rounded-full
+      bg-white
+      px-6
+      py-3
+      text-sm
+      font-bold
+      text-black
+      shadow-lg
+      shadow-black/10
+      transition-all
+      duration-200
+      hover:-translate-y-0.5
+      hover:bg-white/90
+      active:scale-[0.97]
+    "
+              >
+                Ready to speak
+                <ArrowRight size={16} />
+              </button>
+            </div>
 
-          <button
-            type="button"
-            onClick={onStartSpeech}
-            className="
-              mt-4
-              flex
-              items-center
-              gap-2
-              rounded-full
-              bg-white
-              px-6
-              py-3
-              text-sm
-              font-bold
-              text-black
-              shadow-lg
-              shadow-black/10
-              transition-all
-              duration-200
-              hover:-translate-y-0.5
-              hover:bg-white/90
-              active:scale-[0.97]
-            "
-          >
-            Ready to speak
+            {/* Extend Research — RIGHT */}
+            <div className="flex flex-col items-center">
+              <p className="mb-2 text-xs text-white/40">
+                Need more time?
+              </p>
 
-            <ArrowRight size={16} />
-          </button>
+              <button
+                type="button"
+                onClick={onExtendResearch}
+                className="
+      flex
+      items-center
+      gap-2
+      rounded-full
+      border
+      border-white/10
+      bg-white/[0.07]
+      px-5
+      py-3
+      text-sm
+      font-semibold
+      text-white/80
+      transition-all
+      duration-200
+      hover:border-white/20
+      hover:bg-white/[0.12]
+      hover:text-white
+      active:scale-[0.97]
+    "
+              >
+                <RotateCcw size={15} />
+                Extend 1 min
+              </button>
+            </div>
+
+          </div>
 
           {/* Exit */}
 

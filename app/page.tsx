@@ -83,6 +83,10 @@ export default function Home() {
   const currentTopics =
     topics[selectedMode][selectedCategory];
 
+  const [researchExtension, setResearchExtension] = useState(0);
+
+  const [isSoundMuted, setIsSoundMuted] = useState(true);
+
   function changeMode(mode: Mode) {
     cancelSpin();
 
@@ -176,6 +180,12 @@ export default function Home() {
     setCurrentTopic(spinningTopic ?? currentTopic);
     setSpinningTopic(null);
     setIsSpinning(false);
+  }
+
+  function extendResearch() {
+    setTimerType("research");
+    setTimerDuration(60);
+    setResearchExtension((previous) => previous + 1);
   }
 
   return (
@@ -273,6 +283,16 @@ export default function Home() {
                   setShowSettings(true);
                 }}
               />
+              <label className="mt-4 flex cursor-pointer items-center gap-2 text-xs text-white/40 transition-colors hover:text-white/60">
+                <input
+                  type="checkbox"
+                  checked={isSoundMuted}
+                  onChange={(e) => setIsSoundMuted(e.target.checked)}
+                  className="h-3.5 w-3.5 cursor-pointer accent-[#ff6e42]"
+                />
+
+                <span>Mute sound effects</span>
+              </label>
             </div>
 
           </section>
@@ -291,6 +311,9 @@ export default function Home() {
             isDebate={selectedMode === "debate"}
             onExit={exitTimer}
             onStartSpeech={startSpeechFromResearch}
+            onExtendResearch={extendResearch}
+            researchExtension={researchExtension}
+            isSoundMuted={isSoundMuted}
           />
         </div>
       )}
