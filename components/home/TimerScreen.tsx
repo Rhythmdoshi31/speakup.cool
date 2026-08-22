@@ -62,10 +62,7 @@ export default function TimerScreen({
   }, []);
 
   useEffect(() => {
-    if (isSoundMuted) return;
-
-    // Start the sound when 5 seconds remain.
-    if (timeLeft !== 5) return;
+    if (timeLeft !== 0 || isSoundMuted) return;
 
     const audio = timerAudio.current;
 
@@ -127,37 +124,37 @@ export default function TimerScreen({
 
   function togglePause() {
     if (timeLeft <= 0) return;
-  
+
     if (!isPaused) {
       // PAUSING
       const remainingMs = Math.max(
         0,
         (endTimeRef.current ?? Date.now()) - Date.now()
       );
-  
+
       pausedTimeRef.current = remainingMs;
       endTimeRef.current = null;
-  
+
       setIsPaused(true);
       return;
     }
-  
+
     // RESUMING
     endTimeRef.current =
       Date.now() + pausedTimeRef.current;
-  
+
     setIsPaused(false);
   }
 
   function resetTimer() {
     const duration = initialTime ?? 60;
     const durationMs = duration * 1000;
-  
+
     pausedTimeRef.current = durationMs;
     endTimeRef.current = Date.now() + durationMs;
-  
+
     setTimeLeft(duration);
-  
+
     // Reset always pauses
     setIsPaused(true);
   }
