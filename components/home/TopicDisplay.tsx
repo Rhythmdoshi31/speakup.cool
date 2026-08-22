@@ -104,8 +104,8 @@ export default function TopicDisplay({
      */
 
     if (!isSpinning) {
-      setDisplayTopic(topic);
       previousSpinning.current = false;
+      setDisplayTopic(topic);
       return;
     }
 
@@ -122,7 +122,7 @@ export default function TopicDisplay({
 
     if (!finalTopic || topics.length === 0) {
       setDisplayTopic(topic);
-      onSpinComplete();
+      previousSpinning.current = false;
       return;
     }
 

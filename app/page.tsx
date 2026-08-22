@@ -84,9 +84,7 @@ export default function Home() {
     topics[selectedMode][selectedCategory];
 
   function changeMode(mode: Mode) {
-    // Cancel any active spin
-    setIsSpinning(false);
-    setSpinningTopic(null);
+    cancelSpin();
 
     const category = "general";
 
@@ -103,9 +101,7 @@ export default function Home() {
   }
 
   function changeCategory(category: Category) {
-    // Cancel any active spin
-    setIsSpinning(false);
-    setSpinningTopic(null);
+    cancelSpin();
 
     setSelectedCategory(category);
 
@@ -141,12 +137,16 @@ export default function Home() {
   }
 
   function startTimer() {
+    cancelSpin();
+
     setTimerType("speech");
     setTimerDuration(speechTime * 60);
     setIsTimerActive(true);
   }
 
   function startResearch() {
+    cancelSpin();
+
     setTimerType("research");
     setTimerDuration(researchTime * 60);
     setIsTimerActive(true);
@@ -168,6 +168,14 @@ export default function Home() {
     setSpeechTime(newSpeechTime);
     setResearchTime(newResearchTime);
     setShowSettings(false);
+  }
+
+  function cancelSpin() {
+    if (!isSpinning) return;
+
+    setCurrentTopic(spinningTopic ?? currentTopic);
+    setSpinningTopic(null);
+    setIsSpinning(false);
   }
 
   return (
@@ -209,7 +217,7 @@ export default function Home() {
         </span>{" "}
         ↗
       </a>
-      
+
       {/* Home UI */}
       <div className="relative z-10 flex min-h-screen w-full flex-col items-center px-5 pb-10">
         <Navbar />
@@ -260,7 +268,10 @@ export default function Home() {
                 researchTime={researchTime}
                 onStartTimer={startTimer}
                 onStartResearch={startResearch}
-                onSettings={() => setShowSettings(true)}
+                onSettings={() => {
+                  cancelSpin();
+                  setShowSettings(true);
+                }}
               />
             </div>
 
