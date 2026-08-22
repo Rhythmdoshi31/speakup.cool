@@ -98,7 +98,7 @@ export default function TimerScreen({
    */
   if (type === "research" && isFinished) {
     return (
-      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/10 px-6 pt-24">
+      <div className="flex h-full w-full items-center justify-center bg-black/10 px-6 pt-24">
         <div className="flex w-full max-w-6xl animate-timer-enter flex-col items-center text-center">
 
           {/* Timer */}
@@ -190,7 +190,7 @@ export default function TimerScreen({
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/10 px-6 pt-24">
+    <div className="flex h-full w-full items-center justify-center bg-black/10 px-6 pt-24">
       <div className="flex w-full max-w-6xl animate-timer-enter flex-col items-center text-center">
 
         {/* Topic */}
@@ -205,7 +205,7 @@ export default function TimerScreen({
     font-medium
     leading-tight
     tracking-tight
-    text-white/70
+    text-[#f9f9f9]
     sm:text-2xl
     md:text-3xl
     lg:text-4xl

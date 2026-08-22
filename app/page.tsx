@@ -51,15 +51,15 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] =
     useState<Category>("general");
 
-    const [currentTopic, setCurrentTopic] = useState(
-      topics.offTheCuff.general[0],
-    );
+  const [currentTopic, setCurrentTopic] = useState(
+    topics.offTheCuff.general[0],
+  );
 
-    useEffect(() => {
-      setCurrentTopic(
-        getRandomTopic("offTheCuff", "general"),
-      );
-    }, []);
+  useEffect(() => {
+    setCurrentTopic(
+      getRandomTopic("offTheCuff", "general"),
+    );
+  }, []);
 
   const [spinningTopic, setSpinningTopic] = useState<string | null>(null);
 
@@ -83,40 +83,40 @@ export default function Home() {
   const currentTopics =
     topics[selectedMode][selectedCategory];
 
-    function changeMode(mode: Mode) {
-      // Cancel any active spin
-      setIsSpinning(false);
-      setSpinningTopic(null);
-    
-      const category = "general";
-    
-      setSelectedMode(mode);
-      setSelectedCategory(category);
-    
-      const nextTopic = getRandomTopic(
-        mode,
-        category,
-        currentTopic,
-      );
-    
-      setCurrentTopic(nextTopic);
-    }
+  function changeMode(mode: Mode) {
+    // Cancel any active spin
+    setIsSpinning(false);
+    setSpinningTopic(null);
 
-    function changeCategory(category: Category) {
-      // Cancel any active spin
-      setIsSpinning(false);
-      setSpinningTopic(null);
-    
-      setSelectedCategory(category);
-    
-      const nextTopic = getRandomTopic(
-        selectedMode,
-        category,
-        currentTopic,
-      );
-    
-      setCurrentTopic(nextTopic);
-    }
+    const category = "general";
+
+    setSelectedMode(mode);
+    setSelectedCategory(category);
+
+    const nextTopic = getRandomTopic(
+      mode,
+      category,
+      currentTopic,
+    );
+
+    setCurrentTopic(nextTopic);
+  }
+
+  function changeCategory(category: Category) {
+    // Cancel any active spin
+    setIsSpinning(false);
+    setSpinningTopic(null);
+
+    setSelectedCategory(category);
+
+    const nextTopic = getRandomTopic(
+      selectedMode,
+      category,
+      currentTopic,
+    );
+
+    setCurrentTopic(nextTopic);
+  }
 
   function startSpin() {
     if (isSpinning) return;
@@ -188,11 +188,11 @@ export default function Home() {
         target="_blank"
         rel="noopener noreferrer"
         className="
-    fixed
+    absolute
     bottom-6
     right-6
-    z-50
-    text-sm
+    z-30
+    text-xs
     font-medium
     tracking-wide
     text-white/55
@@ -209,7 +209,7 @@ export default function Home() {
         </span>{" "}
         ↗
       </a>
-
+      
       {/* Home UI */}
       <div className="relative z-10 flex min-h-screen w-full flex-col items-center px-5 pb-10">
         <Navbar />
@@ -270,16 +270,18 @@ export default function Home() {
 
       {/* Timer */}
       {isTimerActive && (
-        <TimerScreen
-          topic={currentTopic}
-          initialTime={timerDuration}
-          type={timerType}
-          speechTime={speechTime}
-          debateSide={debateSide}
-          isDebate={selectedMode === "debate"}
-          onExit={exitTimer}
-          onStartSpeech={startSpeechFromResearch}
-        />
+        <div className="fixed inset-0 z-[100]">
+          <TimerScreen
+            topic={currentTopic}
+            initialTime={timerDuration}
+            type={timerType}
+            speechTime={speechTime}
+            debateSide={debateSide}
+            isDebate={selectedMode === "debate"}
+            onExit={exitTimer}
+            onStartSpeech={startSpeechFromResearch}
+          />
+        </div>
       )}
 
       <SettingsModal
