@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createUISFX } from "uisfx";
 
 interface TopicDisplayProps {
   topic: string;
   finalTopic: string | null;
   topics: string[];
   isSpinning: boolean;
+  isSoundMuted: boolean;
   onSpinComplete: () => void;
 }
 
@@ -86,11 +88,16 @@ function createSpinSequence(
   return sequence;
 }
 
+const ui = createUISFX({
+  pack: "minimal",
+});
+
 export default function TopicDisplay({
   topic,
   finalTopic,
   topics,
   isSpinning,
+  isSoundMuted,
   onSpinComplete,
 }: TopicDisplayProps) {
   const [displayTopic, setDisplayTopic] =
@@ -172,30 +179,32 @@ export default function TopicDisplay({
       if (cancelled) return;
 
       if (currentIndex >= sequence.length) {
-        /*
-         * The final topic is already visible.
-         *
-         * Don't change the topic again.
-         */
-
-        const finishTimeout = window.setTimeout(() => {
-          if (!cancelled) {
-            onSpinComplete();
+        if (!cancelled) {
+          if (!isSoundMuted) {
+            ui.play("bonus");
           }
-        }, 500);
 
-        timeoutIds.push(finishTimeout);
+          onSpinComplete();
+        }
 
         return;
       }
 
-      const nextTopic =
-        sequence[currentIndex];
+      const nextTopic = sequence[currentIndex];
+      const isFinalTopic = currentIndex === sequence.length - 1;
 
       setDisplayTopic(nextTopic);
 
-      const delay =
-        timings[currentIndex];
+      if (isFinalTopic) {
+        if (!isSoundMuted) {
+          ui.play("bonus");
+        }
+
+        onSpinComplete();
+        return;
+      }
+
+      const delay = timings[currentIndex];
 
       currentIndex++;
 

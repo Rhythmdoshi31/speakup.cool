@@ -257,6 +257,7 @@ export default function Home() {
                 finalTopic={spinningTopic}
                 topics={currentTopics}
                 isSpinning={isSpinning}
+                isSoundMuted={isSoundMuted}
                 onSpinComplete={finishSpin}
               />
 
