@@ -41,16 +41,20 @@ export default function TimerScreen({
   isSoundMuted,
 }: TimerScreenProps) {
 
-  const [timeLeft, setTimeLeft] = useState(initialTime ?? 60);
+  const duration = initialTime ?? 60;
 
+  const [timeLeft, setTimeLeft] = useState(duration);
   const [isPaused, setIsPaused] = useState(false);
-  
+
+  const endTimeRef = useRef<number | null>(null);
+  const pausedTimeRef = useRef<number>(duration * 1000);
+
   const timerAudio = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     timerAudio.current = new Audio("/timer.mp3");
     timerAudio.current.preload = "auto";
-  
+
     return () => {
       timerAudio.current?.pause();
       timerAudio.current = null;
@@ -59,67 +63,108 @@ export default function TimerScreen({
 
   useEffect(() => {
     if (isSoundMuted) return;
-  
+
     // Start the sound when 5 seconds remain.
     if (timeLeft !== 5) return;
-  
+
     const audio = timerAudio.current;
-  
+
     if (!audio) return;
-  
+
     audio.currentTime = 0;
-  
+
     audio.play().catch(() => {
       // Browser blocked audio playback.
     });
   }, [timeLeft, isSoundMuted]);
-  
+
   useEffect(() => {
-    setTimeLeft(initialTime ?? 60);
+    const duration = initialTime ?? 60;
+    const durationMs = duration * 1000;
+
+    setTimeLeft(duration);
     setIsPaused(false);
+
+    pausedTimeRef.current = durationMs;
+    endTimeRef.current = Date.now() + durationMs;
   }, [initialTime, type, researchExtension]);
-  
-  /*
-  * Research starts immediately.
-  * Speech also starts immediately when we enter it.
-  */
- useEffect(() => {
-   if (isPaused || timeLeft <= 0) {
-     return;
-    }
-    
-    const interval = window.setInterval(() => {
-      setTimeLeft((previousTime) => {
-        if (previousTime <= 1) {
-          setIsPaused(true);
-          return 0;
-        }
-        
-        return previousTime - 1;
-      });
-    }, 1000);
-    
+
+  useEffect(() => {
+    if (isPaused) return;
+
+    const updateTimer = () => {
+      if (endTimeRef.current === null) return;
+
+      const remainingMs = Math.max(
+        0,
+        endTimeRef.current - Date.now()
+      );
+
+      const remainingSeconds = Math.ceil(
+        remainingMs / 1000
+      );
+
+      setTimeLeft(remainingSeconds);
+
+      if (remainingMs <= 0) {
+        setTimeLeft(0);
+        setIsPaused(true);
+        endTimeRef.current = null;
+      }
+    };
+
+    updateTimer();
+
+    const interval = window.setInterval(
+      updateTimer,
+      100
+    );
+
     return () => {
       window.clearInterval(interval);
     };
-  }, [isPaused, timeLeft]);
+  }, [isPaused]);
 
   function togglePause() {
     if (timeLeft <= 0) return;
-    
-    setIsPaused((previous) => !previous);
-  }
   
+    if (!isPaused) {
+      // PAUSING
+      const remainingMs = Math.max(
+        0,
+        (endTimeRef.current ?? Date.now()) - Date.now()
+      );
+  
+      pausedTimeRef.current = remainingMs;
+      endTimeRef.current = null;
+  
+      setIsPaused(true);
+      return;
+    }
+  
+    // RESUMING
+    endTimeRef.current =
+      Date.now() + pausedTimeRef.current;
+  
+    setIsPaused(false);
+  }
+
   function resetTimer() {
-    setTimeLeft(initialTime ?? 60);
-    
-    // Reset always pauses.
+    const duration = initialTime ?? 60;
+    const durationMs = duration * 1000;
+  
+    pausedTimeRef.current = durationMs;
+    endTimeRef.current = Date.now() + durationMs;
+  
+    setTimeLeft(duration);
+  
+    // Reset always pauses
     setIsPaused(true);
   }
-  
+
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
-  
+
   const formattedTime = `${minutes
     .toString()
     .padStart(2, "0")}:${seconds
