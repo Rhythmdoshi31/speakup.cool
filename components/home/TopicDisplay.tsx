@@ -104,6 +104,16 @@ export default function TopicDisplay({
     useState(topic);
 
   const previousSpinning = useRef(false);
+  const soundMutedRef = useRef(isSoundMuted);
+  const onSpinCompleteRef = useRef(onSpinComplete);
+
+  useEffect(() => {
+    soundMutedRef.current = isSoundMuted;
+  }, [isSoundMuted]);
+
+  useEffect(() => {
+    onSpinCompleteRef.current = onSpinComplete;
+  }, [onSpinComplete]);
 
   useEffect(() => {
     /*
@@ -177,42 +187,32 @@ export default function TopicDisplay({
 
     const showNextTopic = () => {
       if (cancelled) return;
-
-      if (currentIndex >= sequence.length) {
-        if (!cancelled) {
-          if (!isSoundMuted) {
-            ui.play("bonus");
-          }
-
-          onSpinComplete();
-        }
-
-        return;
-      }
-
+    
       const nextTopic = sequence[currentIndex];
-      const isFinalTopic = currentIndex === sequence.length - 1;
-
+    
+      const isFinalTopic =
+        currentIndex === sequence.length - 1;
+    
       setDisplayTopic(nextTopic);
-
+    
       if (isFinalTopic) {
-        if (!isSoundMuted) {
+        if (!soundMutedRef.current) {
           ui.play("bonus");
         }
-
-        onSpinComplete();
+    
+        onSpinCompleteRef.current();
         return;
       }
-
+    
       const delay = timings[currentIndex];
-
+    
       currentIndex++;
-
+    
       const timeout = window.setTimeout(
         showNextTopic,
         delay,
       );
-
+    
       timeoutIds.push(timeout);
     };
 
@@ -239,7 +239,6 @@ export default function TopicDisplay({
     finalTopic,
     topics,
     topic,
-    onSpinComplete,
   ]);
 
   return (
