@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String  @id
+  email     String  @unique
+  name      String?
+  avatarUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  practiceSessions PracticeSession[]
+  savedTopics      SavedTopic[]
+}
+
+model PracticeSession {
+  id String @id @default(uuid())
+
+  userId String
+
+  topic    String
+  mode     String
+  category String
+
+  durationSeconds Int
+
+  debateSide String?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, createdAt])
+}
+
+model SavedTopic {
+  id String @id @default(uuid())
+
+  userId String
+  topic  String
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topic])
+  @@index([userId])
+}

@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "components/shader/gradient.js"  ],
+, "components/shader/gradient.js", "app/auth/login"  ],
   "exclude": ["node_modules"]
 }
