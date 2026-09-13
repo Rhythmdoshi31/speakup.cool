@@ -43,6 +43,7 @@ export type PracticeSessionMinAggregateOutputType = {
   durationSeconds: number | null
   debateSide: string | null
   createdAt: Date | null
+  completedAt: Date | null
 }
 
 export type PracticeSessionMaxAggregateOutputType = {
@@ -54,6 +55,7 @@ export type PracticeSessionMaxAggregateOutputType = {
   durationSeconds: number | null
   debateSide: string | null
   createdAt: Date | null
+  completedAt: Date | null
 }
 
 export type PracticeSessionCountAggregateOutputType = {
@@ -65,6 +67,7 @@ export type PracticeSessionCountAggregateOutputType = {
   durationSeconds: number
   debateSide: number
   createdAt: number
+  completedAt: number
   _all: number
 }
 
@@ -86,6 +89,7 @@ export type PracticeSessionMinAggregateInputType = {
   durationSeconds?: true
   debateSide?: true
   createdAt?: true
+  completedAt?: true
 }
 
 export type PracticeSessionMaxAggregateInputType = {
@@ -97,6 +101,7 @@ export type PracticeSessionMaxAggregateInputType = {
   durationSeconds?: true
   debateSide?: true
   createdAt?: true
+  completedAt?: true
 }
 
 export type PracticeSessionCountAggregateInputType = {
@@ -108,6 +113,7 @@ export type PracticeSessionCountAggregateInputType = {
   durationSeconds?: true
   debateSide?: true
   createdAt?: true
+  completedAt?: true
   _all?: true
 }
 
@@ -206,6 +212,7 @@ export type PracticeSessionGroupByOutputType = {
   durationSeconds: number
   debateSide: string | null
   createdAt: Date
+  completedAt: Date | null
   _count: PracticeSessionCountAggregateOutputType | null
   _avg: PracticeSessionAvgAggregateOutputType | null
   _sum: PracticeSessionSumAggregateOutputType | null
@@ -240,6 +247,7 @@ export type PracticeSessionWhereInput = {
   durationSeconds?: Prisma.IntFilter<"PracticeSession"> | number
   debateSide?: Prisma.StringNullableFilter<"PracticeSession"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PracticeSession"> | Date | string
+  completedAt?: Prisma.DateTimeNullableFilter<"PracticeSession"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -252,6 +260,7 @@ export type PracticeSessionOrderByWithRelationInput = {
   durationSeconds?: Prisma.SortOrder
   debateSide?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -267,6 +276,7 @@ export type PracticeSessionWhereUniqueInput = Prisma.AtLeast<{
   durationSeconds?: Prisma.IntFilter<"PracticeSession"> | number
   debateSide?: Prisma.StringNullableFilter<"PracticeSession"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PracticeSession"> | Date | string
+  completedAt?: Prisma.DateTimeNullableFilter<"PracticeSession"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
@@ -279,6 +289,7 @@ export type PracticeSessionOrderByWithAggregationInput = {
   durationSeconds?: Prisma.SortOrder
   debateSide?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PracticeSessionCountOrderByAggregateInput
   _avg?: Prisma.PracticeSessionAvgOrderByAggregateInput
   _max?: Prisma.PracticeSessionMaxOrderByAggregateInput
@@ -298,6 +309,7 @@ export type PracticeSessionScalarWhereWithAggregatesInput = {
   durationSeconds?: Prisma.IntWithAggregatesFilter<"PracticeSession"> | number
   debateSide?: Prisma.StringNullableWithAggregatesFilter<"PracticeSession"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PracticeSession"> | Date | string
+  completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PracticeSession"> | Date | string | null
 }
 
 export type PracticeSessionCreateInput = {
@@ -308,6 +320,7 @@ export type PracticeSessionCreateInput = {
   durationSeconds: number
   debateSide?: string | null
   createdAt?: Date | string
+  completedAt?: Date | string | null
   user: Prisma.UserCreateNestedOneWithoutPracticeSessionsInput
 }
 
@@ -320,6 +333,7 @@ export type PracticeSessionUncheckedCreateInput = {
   durationSeconds: number
   debateSide?: string | null
   createdAt?: Date | string
+  completedAt?: Date | string | null
 }
 
 export type PracticeSessionUpdateInput = {
@@ -330,6 +344,7 @@ export type PracticeSessionUpdateInput = {
   durationSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   debateSide?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutPracticeSessionsNestedInput
 }
 
@@ -342,6 +357,7 @@ export type PracticeSessionUncheckedUpdateInput = {
   durationSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   debateSide?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PracticeSessionCreateManyInput = {
@@ -353,6 +369,7 @@ export type PracticeSessionCreateManyInput = {
   durationSeconds: number
   debateSide?: string | null
   createdAt?: Date | string
+  completedAt?: Date | string | null
 }
 
 export type PracticeSessionUpdateManyMutationInput = {
@@ -363,6 +380,7 @@ export type PracticeSessionUpdateManyMutationInput = {
   durationSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   debateSide?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PracticeSessionUncheckedUpdateManyInput = {
@@ -374,6 +392,7 @@ export type PracticeSessionUncheckedUpdateManyInput = {
   durationSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   debateSide?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PracticeSessionListRelationFilter = {
@@ -395,6 +414,7 @@ export type PracticeSessionCountOrderByAggregateInput = {
   durationSeconds?: Prisma.SortOrder
   debateSide?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
 }
 
 export type PracticeSessionAvgOrderByAggregateInput = {
@@ -410,6 +430,7 @@ export type PracticeSessionMaxOrderByAggregateInput = {
   durationSeconds?: Prisma.SortOrder
   debateSide?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
 }
 
 export type PracticeSessionMinOrderByAggregateInput = {
@@ -421,6 +442,7 @@ export type PracticeSessionMinOrderByAggregateInput = {
   durationSeconds?: Prisma.SortOrder
   debateSide?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
 }
 
 export type PracticeSessionSumOrderByAggregateInput = {
@@ -477,6 +499,10 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type PracticeSessionCreateWithoutUserInput = {
   id?: string
   topic: string
@@ -485,6 +511,7 @@ export type PracticeSessionCreateWithoutUserInput = {
   durationSeconds: number
   debateSide?: string | null
   createdAt?: Date | string
+  completedAt?: Date | string | null
 }
 
 export type PracticeSessionUncheckedCreateWithoutUserInput = {
@@ -495,6 +522,7 @@ export type PracticeSessionUncheckedCreateWithoutUserInput = {
   durationSeconds: number
   debateSide?: string | null
   createdAt?: Date | string
+  completedAt?: Date | string | null
 }
 
 export type PracticeSessionCreateOrConnectWithoutUserInput = {
@@ -535,6 +563,7 @@ export type PracticeSessionScalarWhereInput = {
   durationSeconds?: Prisma.IntFilter<"PracticeSession"> | number
   debateSide?: Prisma.StringNullableFilter<"PracticeSession"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PracticeSession"> | Date | string
+  completedAt?: Prisma.DateTimeNullableFilter<"PracticeSession"> | Date | string | null
 }
 
 export type PracticeSessionCreateManyUserInput = {
@@ -545,6 +574,7 @@ export type PracticeSessionCreateManyUserInput = {
   durationSeconds: number
   debateSide?: string | null
   createdAt?: Date | string
+  completedAt?: Date | string | null
 }
 
 export type PracticeSessionUpdateWithoutUserInput = {
@@ -555,6 +585,7 @@ export type PracticeSessionUpdateWithoutUserInput = {
   durationSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   debateSide?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PracticeSessionUncheckedUpdateWithoutUserInput = {
@@ -565,6 +596,7 @@ export type PracticeSessionUncheckedUpdateWithoutUserInput = {
   durationSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   debateSide?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PracticeSessionUncheckedUpdateManyWithoutUserInput = {
@@ -575,6 +607,7 @@ export type PracticeSessionUncheckedUpdateManyWithoutUserInput = {
   durationSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   debateSide?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -588,6 +621,7 @@ export type PracticeSessionSelect<ExtArgs extends runtime.Types.Extensions.Inter
   durationSeconds?: boolean
   debateSide?: boolean
   createdAt?: boolean
+  completedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["practiceSession"]>
 
@@ -600,6 +634,7 @@ export type PracticeSessionSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   durationSeconds?: boolean
   debateSide?: boolean
   createdAt?: boolean
+  completedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["practiceSession"]>
 
@@ -612,6 +647,7 @@ export type PracticeSessionSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   durationSeconds?: boolean
   debateSide?: boolean
   createdAt?: boolean
+  completedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["practiceSession"]>
 
@@ -624,9 +660,10 @@ export type PracticeSessionSelectScalar = {
   durationSeconds?: boolean
   debateSide?: boolean
   createdAt?: boolean
+  completedAt?: boolean
 }
 
-export type PracticeSessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "topic" | "mode" | "category" | "durationSeconds" | "debateSide" | "createdAt", ExtArgs["result"]["practiceSession"]>
+export type PracticeSessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "topic" | "mode" | "category" | "durationSeconds" | "debateSide" | "createdAt" | "completedAt", ExtArgs["result"]["practiceSession"]>
 export type PracticeSessionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -651,6 +688,7 @@ export type $PracticeSessionPayload<ExtArgs extends runtime.Types.Extensions.Int
     durationSeconds: number
     debateSide: string | null
     createdAt: Date
+    completedAt: Date | null
   }, ExtArgs["result"]["practiceSession"]>
   composites: {}
 }
@@ -1083,6 +1121,7 @@ export interface PracticeSessionFieldRefs {
   readonly durationSeconds: Prisma.FieldRef<"PracticeSession", 'Int'>
   readonly debateSide: Prisma.FieldRef<"PracticeSession", 'String'>
   readonly createdAt: Prisma.FieldRef<"PracticeSession", 'DateTime'>
+  readonly completedAt: Prisma.FieldRef<"PracticeSession", 'DateTime'>
 }
     
 

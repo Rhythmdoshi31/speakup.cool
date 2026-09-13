@@ -118,7 +118,7 @@ export default function LoginPage() {
           }
           className="w-full text-sm opacity-60"
         >
-          Dont have an account? Sign up
+          Dont have an account? <span className="text-white">Sign Up</span>
         </button>
       </form>
     </main>

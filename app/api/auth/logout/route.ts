@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
+
 import { createClient } from "@/lib/supabase/server";
 
-export async function POST() {
+export async function POST(request: Request) {
   const supabase = await createClient();
 
-  const { error } =
-    await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
 
   if (error) {
     return NextResponse.json(
@@ -18,7 +18,7 @@ export async function POST() {
     );
   }
 
-  return NextResponse.json({
-    success: true,
-  });
+  return NextResponse.redirect(
+    new URL("/", request.url),
+  );
 }

@@ -700,7 +700,8 @@ export const PracticeSessionScalarFieldEnum = {
   category: 'category',
   durationSeconds: 'durationSeconds',
   debateSide: 'debateSide',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  completedAt: 'completedAt'
 } as const
 
 export type PracticeSessionScalarFieldEnum = (typeof PracticeSessionScalarFieldEnum)[keyof typeof PracticeSessionScalarFieldEnum]

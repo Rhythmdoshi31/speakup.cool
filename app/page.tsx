@@ -28,7 +28,6 @@ type TimerScreenProps = {
 };
 
 export default function Home() {
-
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -45,20 +44,16 @@ export default function Home() {
     },
   };
 
-  const [selectedMode, setSelectedMode] =
-    useState<Mode>("offTheCuff");
+  const [selectedMode, setSelectedMode] = useState<Mode>("offTheCuff");
 
-  const [selectedCategory, setSelectedCategory] =
-    useState<Category>("general");
+  const [selectedCategory, setSelectedCategory] = useState<Category>("general");
 
   const [currentTopic, setCurrentTopic] = useState(
     topics.offTheCuff.general[0],
   );
 
   useEffect(() => {
-    setCurrentTopic(
-      getRandomTopic("offTheCuff", "general"),
-    );
+    setCurrentTopic(getRandomTopic("offTheCuff", "general"));
   }, []);
 
   const [spinningTopic, setSpinningTopic] = useState<string | null>(null);
@@ -75,17 +70,17 @@ export default function Home() {
 
   const [timerDuration, setTimerDuration] = useState(60);
 
-  const [timerType, setTimerType] =
-    useState<"speech" | "research">("speech");
+  const [timerType, setTimerType] = useState<"speech" | "research">("speech");
 
   const [debateSide, setDebateSide] = useState<"for" | "against">("for");
 
-  const currentTopics =
-    topics[selectedMode][selectedCategory];
+  const currentTopics = topics[selectedMode][selectedCategory];
 
   const [researchExtension, setResearchExtension] = useState(0);
 
   const [isSoundMuted, setIsSoundMuted] = useState(true);
+
+  const [streakRefreshKey, setStreakRefreshKey] = useState(0);
 
   function changeMode(mode: Mode) {
     cancelSpin();
@@ -95,11 +90,7 @@ export default function Home() {
     setSelectedMode(mode);
     setSelectedCategory(category);
 
-    const nextTopic = getRandomTopic(
-      mode,
-      category,
-      currentTopic,
-    );
+    const nextTopic = getRandomTopic(mode, category, currentTopic);
 
     setCurrentTopic(nextTopic);
   }
@@ -109,11 +100,7 @@ export default function Home() {
 
     setSelectedCategory(category);
 
-    const nextTopic = getRandomTopic(
-      selectedMode,
-      category,
-      currentTopic,
-    );
+    const nextTopic = getRandomTopic(selectedMode, category, currentTopic);
 
     setCurrentTopic(nextTopic);
   }
@@ -165,10 +152,7 @@ export default function Home() {
     setIsTimerActive(false);
   }
 
-  function saveSettings(
-    newSpeechTime: number,
-    newResearchTime: number,
-  ) {
+  function saveSettings(newSpeechTime: number, newResearchTime: number) {
     setSpeechTime(newSpeechTime);
     setResearchTime(newResearchTime);
     setShowSettings(false);
@@ -190,7 +174,6 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen w-full overflow-hidden">
-
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -230,17 +213,17 @@ export default function Home() {
 
       {/* Home UI */}
       <div className="relative z-10 flex min-h-screen w-full flex-col items-center px-5 pb-10">
-        <Navbar />
+        <Navbar streakRefreshKey={streakRefreshKey} />
 
         {/* Everything below navbar disappears during timer */}
         <div
-          className={`pt-5 flex w-full flex-1 flex-col items-center transition-opacity duration-300 ${isTimerActive
-            ? "pointer-events-none invisible opacity-0"
-            : "visible opacity-100"
-            }`}
+          className={`pt-5 flex w-full flex-1 flex-col items-center transition-opacity duration-300 ${
+            isTimerActive
+              ? "pointer-events-none invisible opacity-0"
+              : "visible opacity-100"
+          }`}
         >
           <section className="flex w-full max-w-6xl flex-1 flex-col items-center text-center">
-
             <ModeSelector
               selectedMode={selectedMode}
               onModeChange={changeMode}
@@ -268,10 +251,7 @@ export default function Home() {
                 />
               )}
 
-              <SpinButton
-                isSpinning={isSpinning}
-                onSpin={startSpin}
-              />
+              <SpinButton isSpinning={isSpinning} onSpin={startSpin} />
 
               <ActionButtons
                 selectedMode={selectedMode}
@@ -295,7 +275,6 @@ export default function Home() {
                 <span>Mute sound effects</span>
               </label>
             </div>
-
           </section>
         </div>
       </div>
@@ -307,6 +286,9 @@ export default function Home() {
             topic={currentTopic}
             initialTime={timerDuration}
             type={timerType}
+            mode={selectedMode}
+            category={selectedCategory}
+            onSessionComplete={() => setStreakRefreshKey((value) => value + 1)}
             speechTime={speechTime}
             debateSide={debateSide}
             isDebate={selectedMode === "debate"}

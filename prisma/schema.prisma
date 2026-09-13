@@ -30,15 +30,16 @@ model PracticeSession {
   category String
 
   durationSeconds Int
+  debateSide      String?
 
-  debateSide String?
-
-  createdAt DateTime @default(now())
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([userId, createdAt])
+  @@index([userId, completedAt])
 }
 
 model SavedTopic {
