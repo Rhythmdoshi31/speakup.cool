@@ -3,19 +3,25 @@
 import { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import Navbar from "@/components/home/Navbar";
 
 export default function SignupPage() {
   const router = useRouter();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] =
+    useState("");
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] =
+    useState(false);
 
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] =
+    useState<string | null>(null);
 
-  async function handleSignup(e: FormEvent<HTMLFormElement>) {
+  async function handleSignup(
+    e: FormEvent<HTMLFormElement>,
+  ) {
     e.preventDefault();
 
     setLoading(true);
@@ -23,18 +29,16 @@ export default function SignupPage() {
 
     const supabase = createClient();
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
+    const { data, error } =
+      await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+          },
         },
-      },
-    });
-
-    console.log("SIGNUP DATA:", data);
-    console.log("SIGNUP ERROR:", error);
+      });
 
     if (error) {
       setError(error.message);
@@ -43,26 +47,36 @@ export default function SignupPage() {
     }
 
     if (!data.user) {
-      setError("Supabase did not return a user.");
+      setError(
+        "Supabase did not return a user.",
+      );
       setLoading(false);
       return;
     }
 
-    console.log("SUPABASE USER:", data.user);
-    console.log("SUPABASE SESSION:", data.session);
+    const profileResponse =
+      await fetch("/api/auth/profile", {
+        method: "POST",
+      });
 
-    const profileResponse = await fetch("/api/auth/profile", {
-      method: "POST",
-    });
+    let profileData: {
+      error?: string;
+    } = {};
 
-    console.log("PROFILE STATUS:", profileResponse.status);
-
-    const profileData = await profileResponse.json();
-
-    console.log("PROFILE RESPONSE:", profileData);
+    try {
+      profileData =
+        await profileResponse.json();
+    } catch {
+      // Ignore invalid/empty response.
+    }
 
     if (!profileResponse.ok) {
-      setError(`Profile setup failed: ${profileData.error ?? "Unknown error"}`);
+      setError(
+        `Profile setup failed: ${
+          profileData.error ??
+          "Unknown error"
+        }`,
+      );
       setLoading(false);
       return;
     }
@@ -72,60 +86,225 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-5">
-      <form onSubmit={handleSignup} className="w-full max-w-md space-y-5">
-        <div>
-          <h1 className="text-3xl font-bold">Create your account</h1>
+    <main className="min-h-screen w-full">
+      <div className="flex min-h-screen w-full flex-col items-center px-5">
+        <Navbar />
 
-          <p className="mt-2 text-sm opacity-60">Keep your SpeakUp progress.</p>
+        <div className="flex w-full flex-1 items-center justify-center pb-16">
+          <form
+            onSubmit={handleSignup}
+            className="
+              w-full
+              max-w-md
+              rounded-3xl
+              border
+              border-white/10
+              bg-white/[0.05]
+              p-6
+              shadow-2xl
+              shadow-black/10
+              backdrop-blur-md
+              sm:p-8
+            "
+          >
+            {/* Header */}
+
+            <div className="mb-7">
+              <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                Create your account
+              </h1>
+
+              <p className="mt-2 text-sm leading-5 text-white/55">
+                Keep your SpeakUp progress.
+              </p>
+            </div>
+
+            {/* Name */}
+
+            <div className="space-y-2">
+              <label
+                htmlFor="name"
+                className="text-sm font-medium text-white/70"
+              >
+                Name
+              </label>
+
+              <input
+                id="name"
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) =>
+                  setName(e.target.value)
+                }
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-white/10
+                  bg-white/[0.06]
+                  px-4
+                  py-3
+                  text-sm
+                  text-white
+                  outline-none
+                  placeholder:text-white/30
+                  transition
+                  focus:border-white/25
+                  focus:bg-white/[0.08]
+                "
+                required
+                autoComplete="name"
+              />
+            </div>
+
+            {/* Email */}
+
+            <div className="mt-4 space-y-2">
+              <label
+                htmlFor="email"
+                className="text-sm font-medium text-white/70"
+              >
+                Email
+              </label>
+
+              <input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) =>
+                  setEmail(e.target.value)
+                }
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-white/10
+                  bg-white/[0.06]
+                  px-4
+                  py-3
+                  text-sm
+                  text-white
+                  outline-none
+                  placeholder:text-white/30
+                  transition
+                  focus:border-white/25
+                  focus:bg-white/[0.08]
+                "
+                required
+                autoComplete="email"
+              />
+            </div>
+
+            {/* Password */}
+
+            <div className="mt-4 space-y-2">
+              <label
+                htmlFor="password"
+                className="text-sm font-medium text-white/70"
+              >
+                Password
+              </label>
+
+              <input
+                id="password"
+                type="password"
+                placeholder="At least 6 characters"
+                value={password}
+                onChange={(e) =>
+                  setPassword(e.target.value)
+                }
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-white/10
+                  bg-white/[0.06]
+                  px-4
+                  py-3
+                  text-sm
+                  text-white
+                  outline-none
+                  placeholder:text-white/30
+                  transition
+                  focus:border-white/25
+                  focus:bg-white/[0.08]
+                "
+                required
+                minLength={6}
+                autoComplete="new-password"
+              />
+            </div>
+
+            {/* Error */}
+
+            {error && (
+              <div className="mt-4 rounded-xl border border-red-400/15 bg-red-400/[0.06] px-4 py-3">
+                <p className="text-sm leading-5 text-red-300">
+                  {error}
+                </p>
+              </div>
+            )}
+
+            {/* Create account */}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="
+                mt-6
+                flex
+                w-full
+                items-center
+                justify-center
+                rounded-xl
+                bg-white
+                px-4
+                py-3
+                text-sm
+                font-bold
+                text-black
+                transition-all
+                duration-200
+                hover:-translate-y-0.5
+                hover:bg-white/90
+                active:scale-[0.98]
+                disabled:cursor-not-allowed
+                disabled:opacity-50
+                disabled:hover:translate-y-0
+              "
+            >
+              {loading
+                ? "Creating account..."
+                : "Create account"}
+            </button>
+
+            {/* Login */}
+
+            <button
+              type="button"
+              onClick={() =>
+                router.push("/auth/login")
+              }
+              className="
+                mt-5
+                w-full
+                text-center
+                text-sm
+                text-white/50
+                transition
+                hover:text-white/80
+              "
+            >
+              Already have an account?{" "}
+              <span className="font-semibold text-white/80">
+                Log in
+              </span>
+            </button>
+          </form>
         </div>
-
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-xl border px-4 py-3"
-          required
-        />
-
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-xl border px-4 py-3"
-          required
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-xl border px-4 py-3"
-          required
-          minLength={6}
-        />
-
-        {error && <p className="text-sm text-red-500">{error}</p>}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-xl bg-black px-4 py-3 text-white disabled:opacity-50"
-        >
-          {loading ? "Creating account..." : "Create account"}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => router.push("/auth/login")}
-          className="w-full text-sm opacity-60"
-        >
-          Already have an account? Log in
-        </button>
-      </form>
+      </div>
     </main>
   );
 }

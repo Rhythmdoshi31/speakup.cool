@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Mic, UserRound } from "lucide-react";
+import { ArrowLeft, UserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 type UserData = {
@@ -51,21 +51,22 @@ export default function Navbar({
     loadUser();
   }, [streakRefreshKey]);
 
-  const showSpeakButton =
-    pathname === "/profile" ||
-    pathname === "/streak";
+  const showBackButton =
+    pathname === "/auth/login" ||
+    pathname === "/auth/signup";
 
   return (
-    <nav className="relative flex h-24 w-full max-w-6xl items-center justify-center">
-      {/* Speak */}
+    <nav className="flex h-24 w-full max-w-6xl items-center justify-center">
+      {/* Back button - auth pages only */}
 
-      {showSpeakButton && (
+      {showBackButton && (
         <Link
           href="/"
-          aria-label="Speak"
+          aria-label="Back"
           className="
             absolute
-            left-0
+            left-5
+            sm:left-8
             flex
             h-10
             items-center
@@ -87,8 +88,8 @@ export default function Navbar({
             active:scale-95
           "
         >
-          <Mic size={17} strokeWidth={2} />
-          <span>Speak</span>
+          <ArrowLeft size={17} strokeWidth={2} />
+          <span>Back</span>
         </Link>
       )}
 
@@ -103,7 +104,7 @@ export default function Navbar({
 
       {/* Right side */}
 
-      <div className="absolute right-0 flex items-center gap-2">
+      <div className="absolute right-5 flex items-center gap-2 sm:right-8">
         {auth?.authenticated ? (
           <>
             {/* Streak */}

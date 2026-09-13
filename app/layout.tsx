@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Mulish } from "next/font/google";
+import HomeGradient from "@/components/home/gradient";
 import "./globals.css";
 
 const mulish = Mulish({
@@ -131,7 +132,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${mulish.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="relative min-h-screen flex flex-col bg-black">
+        {/* Global background */}
+        <div className="pointer-events-none fixed inset-0 -z-10">
+          <HomeGradient />
+        </div>
+
+        {/* Page content */}
+        <div className="relative z-0 min-h-screen">
+          {children}
+        </div>
+      </body>
     </html>
   );
 }
