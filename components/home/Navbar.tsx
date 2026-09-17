@@ -53,7 +53,10 @@ export default function Navbar({
 
   const showBackButton =
     pathname === "/auth/login" ||
-    pathname === "/auth/signup";
+    pathname === "/auth/signup" ||
+    pathname === "/streak"
+    pathname === "/profile";
+
 
   return (
     <nav className="flex h-24 w-full max-w-6xl items-center justify-center">
