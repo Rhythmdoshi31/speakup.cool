@@ -54,7 +54,7 @@ export default function Navbar({
   const showBackButton =
     pathname === "/auth/login" ||
     pathname === "/auth/signup" ||
-    pathname === "/streak"
+    pathname === "/streak" ||
     pathname === "/profile";
 
 
