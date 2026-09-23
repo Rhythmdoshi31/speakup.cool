@@ -56,6 +56,7 @@ export default function TimerScreen({
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isPaused, setIsPaused] = useState(false);
   const [guestCompletion, setGuestCompletion] = useState(false);
+  const [dontRemindToday, setDontRemindToday] = useState(false);
 
   const endTimeRef = useRef<number | null>(null);
   const pausedTimeRef = useRef<number>(duration * 1000);
@@ -101,6 +102,7 @@ export default function TimerScreen({
     setTimeLeft(duration);
     setIsPaused(false);
     setGuestCompletion(false);
+    setDontRemindToday(false);
 
     pausedTimeRef.current = durationMs;
     endTimeRef.current = Date.now() + durationMs;
@@ -149,6 +151,41 @@ export default function TimerScreen({
   }, [isPaused]);
 
   /*
+   * GUEST POPUP PREFERENCE
+   *
+   * If the user chose "Don't remind me again today",
+   * don't show the popup again until the next calendar day.
+   */
+  function getGuestPopupStorageKey() {
+    const today = new Date().toISOString().split("T")[0];
+
+    return `speakup_guest_popup_dismissed_${today}`;
+  }
+
+  function hasDismissedGuestPopupToday() {
+    try {
+      return (
+        localStorage.getItem(
+          getGuestPopupStorageKey(),
+        ) === "true"
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  function dismissGuestPopupForToday() {
+    try {
+      localStorage.setItem(
+        getGuestPopupStorageKey(),
+        "true",
+      );
+    } catch {
+      // Ignore localStorage errors.
+    }
+  }
+
+  /*
    * HANDLE COMPLETED SPEECH SESSION
    *
    * Logged in:
@@ -156,7 +193,8 @@ export default function TimerScreen({
    *
    * Logged out:
    *   Do not save anything.
-   *   Show guest streak popup instead.
+   *   Show guest streak popup unless the user
+   *   already dismissed it for today.
    */
   useEffect(() => {
     if (type !== "speech") return;
@@ -179,7 +217,10 @@ export default function TimerScreen({
          * rather than attempting to save the session.
          */
         if (!authResponse.ok) {
-          setGuestCompletion(true);
+          if (!hasDismissedGuestPopupToday()) {
+            setGuestCompletion(true);
+          }
+
           return;
         }
 
@@ -190,7 +231,10 @@ export default function TimerScreen({
          * GUEST
          */
         if (!authData.authenticated) {
-          setGuestCompletion(true);
+          if (!hasDismissedGuestPopupToday()) {
+            setGuestCompletion(true);
+          }
+
           return;
         }
 
@@ -296,11 +340,23 @@ export default function TimerScreen({
 
     setTimeLeft(duration);
     setGuestCompletion(false);
+    setDontRemindToday(false);
 
     sessionSavedRef.current = false;
     completionCheckedRef.current = false;
 
     setIsPaused(true);
+  }
+
+  /*
+   * CLOSE GUEST POPUP
+   */
+  function closeGuestPopup() {
+    if (dontRemindToday) {
+      dismissGuestPopupForToday();
+    }
+
+    setGuestCompletion(false);
   }
 
   const minutes = Math.floor(timeLeft / 60);
@@ -451,6 +507,7 @@ export default function TimerScreen({
           <div className="absolute inset-x-0 bottom-0 top-24 z-50 flex items-center justify-center bg-black/35 px-5 backdrop-blur-[2px]">
             <div
               className="
+                relative
                 w-full
                 max-w-md
                 animate-timer-enter
@@ -465,12 +522,45 @@ export default function TimerScreen({
                 shadow-black/30
               "
             >
+              {/* CLOSE */}
+
+              <button
+                type="button"
+                onClick={closeGuestPopup}
+                aria-label="Close"
+                className="
+                  absolute
+                  right-4
+                  top-4
+                  flex
+                  h-8
+                  w-8
+                  items-center
+                  justify-center
+                  rounded-full
+                  border
+                  border-white/10
+                  bg-white/[0.06]
+                  text-white/55
+                  transition-all
+                  duration-200
+                  hover:border-white/20
+                  hover:bg-white/[0.1]
+                  hover:text-white
+                  active:scale-95
+                "
+              >
+                <X size={15} />
+              </button>
+
               {/* FIRE */}
+
               <div className="text-5xl leading-none">
                 🔥
               </div>
 
               {/* STREAK */}
+
               <div className="mt-4 flex items-baseline justify-center gap-2">
                 <span className="text-4xl font-black tracking-tight text-white">
                   1
@@ -482,6 +572,7 @@ export default function TimerScreen({
               </div>
 
               {/* MESSAGE */}
+
               <p className="mt-4 text-base font-medium text-white/85">
                 You did it! Your streak starts today.
               </p>
@@ -492,6 +583,7 @@ export default function TimerScreen({
               </p>
 
               {/* ACTIONS */}
+
               <div className="mt-6 flex flex-col gap-2.5">
                 <Link
                   href="/auth/login"
@@ -545,21 +637,29 @@ export default function TimerScreen({
                 </Link>
               </div>
 
-              {/* EXIT */}
-              <button
-                type="button"
-                onClick={onExit}
-                className="
-                  mt-5
-                  text-xs
-                  font-medium
-                  text-white/40
-                  transition
-                  hover:text-white/70
-                "
-              >
-                Exit timer
-              </button>
+              {/* DON'T REMIND */}
+
+              <label className="mt-5 flex cursor-pointer items-center justify-center gap-2 text-xs text-white/45 transition-colors hover:text-white/65">
+                <input
+                  type="checkbox"
+                  checked={dontRemindToday}
+                  onChange={(event) =>
+                    setDontRemindToday(
+                      event.target.checked,
+                    )
+                  }
+                  className="
+                    h-3.5
+                    w-3.5
+                    cursor-pointer
+                    accent-white
+                  "
+                />
+
+                <span>
+                  Don't remind me again today
+                </span>
+              </label>
             </div>
           </div>
         )}
@@ -567,8 +667,10 @@ export default function TimerScreen({
       {/* =========================================================
           MAIN TIMER
           ========================================================= */}
+
       <div className="flex w-full max-w-6xl animate-timer-enter flex-col items-center text-center">
         {/* TOPIC */}
+
         <p
           className="
             mb-8
@@ -590,11 +692,13 @@ export default function TimerScreen({
         </p>
 
         {/* TIMER */}
+
         <div className="select-none text-[clamp(5rem,16vw,10rem)] font-bold leading-none tracking-[-0.06em] text-white tabular-nums">
           {formattedTime}
         </div>
 
         {/* STATUS */}
+
         <p className="mt-7 text-base font-medium tracking-wide text-white/55 sm:text-lg">
           {isFinished
             ? "Time's up"
@@ -610,6 +714,7 @@ export default function TimerScreen({
         </p>
 
         {/* CONTROLS */}
+
         <div className="mt-9 flex items-center gap-3">
           <button
             type="button"
@@ -678,6 +783,7 @@ export default function TimerScreen({
         </div>
 
         {/* EXIT */}
+
         <button
           type="button"
           onClick={onExit}
