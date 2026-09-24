@@ -2,13 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import {
-  Pause,
-  Play,
-  RotateCcw,
-  X,
-  ArrowRight,
-} from "lucide-react";
+import { Pause, Play, RotateCcw, X, ArrowRight } from "lucide-react";
 
 type TimerType = "speech" | "research";
 
@@ -94,21 +88,29 @@ export default function TimerScreen({
 
   /*
    * RESET TIMER WHEN TOPIC / TIMER CHANGES
+   *
+   * Refs are reset immediately.
+   * React state is reset on the next animation frame to avoid
+   * synchronous setState inside the effect.
    */
   useEffect(() => {
-    const duration = initialTime ?? 60;
-    const durationMs = duration * 1000;
-
-    setTimeLeft(duration);
-    setIsPaused(false);
-    setGuestCompletion(false);
-    setDontRemindToday(false);
+    const nextDuration = initialTime ?? 60;
+    const durationMs = nextDuration * 1000;
 
     pausedTimeRef.current = durationMs;
     endTimeRef.current = Date.now() + durationMs;
 
     sessionSavedRef.current = false;
     completionCheckedRef.current = false;
+
+    const resetFrame = window.requestAnimationFrame(() => {
+      setTimeLeft(nextDuration);
+      setIsPaused(false);
+      setGuestCompletion(false);
+      setDontRemindToday(false);
+    });
+
+    return () => window.cancelAnimationFrame(resetFrame);
   }, [initialTime, type, researchExtension]);
 
   /*
@@ -117,7 +119,7 @@ export default function TimerScreen({
   useEffect(() => {
     if (isPaused) return;
 
-    const updateTimer = () => {
+    const interval = window.setInterval(() => {
       if (endTimeRef.current === null) return;
 
       const remainingMs = Math.max(
@@ -125,25 +127,21 @@ export default function TimerScreen({
         endTimeRef.current - Date.now(),
       );
 
-      const remainingSeconds = Math.ceil(
-        remainingMs / 1000,
-      );
+      const remainingSeconds = Math.ceil(remainingMs / 1000);
 
-      setTimeLeft(remainingSeconds);
+      setTimeLeft((previous) => {
+        if (previous === remainingSeconds) {
+          return previous;
+        }
+
+        return remainingSeconds;
+      });
 
       if (remainingMs <= 0) {
-        setTimeLeft(0);
-        setIsPaused(true);
         endTimeRef.current = null;
+        setIsPaused(true);
       }
-    };
-
-    updateTimer();
-
-    const interval = window.setInterval(
-      updateTimer,
-      100,
-    );
+    }, 100);
 
     return () => {
       window.clearInterval(interval);
@@ -153,22 +151,25 @@ export default function TimerScreen({
   /*
    * GUEST POPUP PREFERENCE
    *
-   * If the user chose "Don't remind me again today",
-   * don't show the popup again until the next calendar day.
+   * Uses the user's local calendar date.
    */
-  function getGuestPopupStorageKey() {
-    const today = new Date().toISOString().split("T")[0];
+  function getTodayKey() {
+    const today = new Date();
 
-    return `speakup_guest_popup_dismissed_${today}`;
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function getGuestPopupStorageKey() {
+    return `speakup_guest_popup_dismissed_${getTodayKey()}`;
   }
 
   function hasDismissedGuestPopupToday() {
     try {
-      return (
-        localStorage.getItem(
-          getGuestPopupStorageKey(),
-        ) === "true"
-      );
+      return localStorage.getItem(getGuestPopupStorageKey()) === "true";
     } catch {
       return false;
     }
@@ -176,10 +177,7 @@ export default function TimerScreen({
 
   function dismissGuestPopupForToday() {
     try {
-      localStorage.setItem(
-        getGuestPopupStorageKey(),
-        "true",
-      );
+      localStorage.setItem(getGuestPopupStorageKey(), "true");
     } catch {
       // Ignore localStorage errors.
     }
@@ -205,16 +203,12 @@ export default function TimerScreen({
 
     async function handleCompletion() {
       try {
-        const authResponse = await fetch(
-          "/api/auth/me",
-          {
-            cache: "no-store",
-          },
-        );
+        const authResponse = await fetch("/api/auth/me", {
+          cache: "no-store",
+        });
 
         /*
-         * If auth check fails, treat the user as a guest
-         * rather than attempting to save the session.
+         * If auth check fails, treat the user as a guest.
          */
         if (!authResponse.ok) {
           if (!hasDismissedGuestPopupToday()) {
@@ -224,8 +218,7 @@ export default function TimerScreen({
           return;
         }
 
-        const authData: AuthResponse =
-          await authResponse.json();
+        const authData: AuthResponse = await authResponse.json();
 
         /*
          * GUEST
@@ -245,29 +238,22 @@ export default function TimerScreen({
 
         sessionSavedRef.current = true;
 
-        const response = await fetch(
-          "/api/practice",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              topic,
-              mode,
-              category,
-              durationSeconds: speechTime * 60,
-              debateSide: isDebate
-                ? debateSide
-                : null,
-            }),
+        const response = await fetch("/api/practice", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          body: JSON.stringify({
+            topic,
+            mode,
+            category,
+            durationSeconds: speechTime * 60,
+            debateSide: isDebate ? debateSide : null,
+          }),
+        });
 
         if (!response.ok) {
-          console.error(
-            "Failed to save practice session",
-          );
+          console.error("Failed to save practice session");
 
           sessionSavedRef.current = false;
           completionCheckedRef.current = false;
@@ -311,8 +297,7 @@ export default function TimerScreen({
     if (!isPaused) {
       const remainingMs = Math.max(
         0,
-        (endTimeRef.current ?? Date.now()) -
-          Date.now(),
+        (endTimeRef.current ?? Date.now()) - Date.now(),
       );
 
       pausedTimeRef.current = remainingMs;
@@ -332,13 +317,13 @@ export default function TimerScreen({
    * RESET
    */
   function resetTimer() {
-    const duration = initialTime ?? 60;
-    const durationMs = duration * 1000;
+    const nextDuration = initialTime ?? 60;
+    const durationMs = nextDuration * 1000;
 
     pausedTimeRef.current = durationMs;
     endTimeRef.current = Date.now() + durationMs;
 
-    setTimeLeft(duration);
+    setTimeLeft(nextDuration);
     setGuestCompletion(false);
     setDontRemindToday(false);
 
@@ -371,14 +356,97 @@ export default function TimerScreen({
   const isFinished = timeLeft === 0;
 
   /*
+   * CIRCULAR TIMER
+   *
+   * Direction:
+   *
+   *        12
+   *        ↓
+   *    9 ←   → 3
+   *        ↑
+   *        6
+   *
+   * Actual progress direction:
+   *
+   * 12 → 9 → 6 → 3 → 12
+   *
+   * The path itself defines this direction.
+   */
+  const circleRadius = 112;
+  const circleCircumference =
+    2 * Math.PI * circleRadius;
+
+  const progress =
+    duration > 0
+      ? Math.min(1, Math.max(0, 1 - timeLeft / duration))
+      : 1;
+
+  /*
+   * This path starts at 12 o'clock and travels:
+   *
+   * 12 → LEFT → BOTTOM → RIGHT → 12
+   *
+   * Using pathLength="1" makes the dash length equal
+   * to the progress percentage directly.
+   */
+  const progressPath = `
+    M 120 8
+    A 112 112 0 1 0 120 232
+    A 112 112 0 1 0 120 8
+  `;
+
+  /*
    * RESEARCH COMPLETION SCREEN
    */
   if (type === "research" && isFinished) {
     return (
       <div className="flex h-full w-full items-center justify-center bg-black/10 px-6 pt-24">
         <div className="flex w-full max-w-6xl animate-timer-enter flex-col items-center text-center">
-          <div className="select-none text-[clamp(5rem,16vw,10rem)] font-bold leading-none tracking-[-0.06em] text-white tabular-nums">
-            00:00
+          {/* CIRCULAR TIMER */}
+
+          <div
+            className="
+              relative
+              flex
+              h-[clamp(18rem,36vw,24rem)]
+              w-[clamp(18rem,36vw,24rem)]
+              items-center
+              justify-center
+              select-none
+            "
+          >
+            <svg
+              className="absolute inset-0 h-full w-full"
+              viewBox="0 0 240 240"
+            >
+              {/* Background circle */}
+
+              <circle
+                cx="120"
+                cy="120"
+                r={circleRadius}
+                fill="none"
+                stroke="rgba(255,255,255,0.08)"
+                strokeWidth="7"
+              />
+
+              {/* Completed progress path */}
+
+              <path
+                d={progressPath}
+                pathLength="1"
+                fill="none"
+                stroke="rgba(255,255,255,0.9)"
+                strokeWidth="7"
+                strokeLinecap="round"
+                strokeDasharray="1 1"
+                strokeDashoffset="0"
+              />
+            </svg>
+
+            <div className="relative z-10 select-none text-[clamp(3.25rem,7vw,5.5rem)] font-bold leading-none tracking-[-0.05em] text-white tabular-nums">
+              00:00
+            </div>
           </div>
 
           <p className="mt-8 text-xl font-medium text-white/70 sm:text-2xl">
@@ -501,6 +569,7 @@ export default function TimerScreen({
       {/* =========================================================
           GUEST STREAK POPUP
           ========================================================= */}
+
       {type === "speech" &&
         isFinished &&
         guestCompletion && (
@@ -578,8 +647,8 @@ export default function TimerScreen({
               </p>
 
               <p className="mt-2 text-sm leading-5 text-white/50">
-                Log in or create an account to save
-                your streak and keep it going tomorrow.
+                Log in or create an account to save your
+                streak and keep it going tomorrow.
               </p>
 
               {/* ACTIONS */}
@@ -657,7 +726,7 @@ export default function TimerScreen({
                 />
 
                 <span>
-                  Don't remind me again today
+                  Don&apos;t remind me again today
                 </span>
               </label>
             </div>
@@ -691,10 +760,68 @@ export default function TimerScreen({
           {topic}
         </p>
 
-        {/* TIMER */}
+        {/* CIRCULAR TIMER */}
 
-        <div className="select-none text-[clamp(5rem,16vw,10rem)] font-bold leading-none tracking-[-0.06em] text-white tabular-nums">
-          {formattedTime}
+        <div
+          className="
+            relative
+            flex
+            h-[clamp(18rem,36vw,24rem)]
+            w-[clamp(18rem,36vw,24rem)]
+            items-center
+            justify-center
+            select-none
+          "
+        >
+          <svg
+            className="absolute inset-0 h-full w-full"
+            viewBox="0 0 240 240"
+          >
+            {/* Background circle */}
+
+            <circle
+              cx="120"
+              cy="120"
+              r={circleRadius}
+              fill="none"
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth="7"
+            />
+
+            {/*
+
+              PROGRESS DIRECTION:
+
+              12 o'clock
+                  ↓
+              9 ←     → 3
+                  ↑
+                  6
+
+              The actual path direction is:
+
+              12 → 9 → 6 → 3 → 12
+
+            */}
+
+            <path
+              d={progressPath}
+              pathLength="1"
+              fill="none"
+              stroke="rgba(255,255,255,0.9)"
+              strokeWidth="7"
+              // strokeLinecap="round"
+              strokeDasharray={`${progress} ${1 - progress}`}
+              strokeDashoffset="0"
+              className="transition-[stroke-dasharray] duration-1000 ease-linear"
+            />
+          </svg>
+
+          {/* TIMER COUNTER */}
+
+          <div className="relative z-10 select-none text-[clamp(3.25rem,7vw,5.5rem)] font-bold leading-none tracking-[-0.05em] text-white tabular-nums">
+            {formattedTime}
+          </div>
         </div>
 
         {/* STATUS */}
