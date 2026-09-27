@@ -10,18 +10,13 @@ export default function SignupPage() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] =
-    useState("");
+  const [password, setPassword] = useState("");
 
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [error, setError] =
-    useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  async function handleSignup(
-    e: FormEvent<HTMLFormElement>,
-  ) {
+  async function handleSignup(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     setLoading(true);
@@ -29,16 +24,15 @@ export default function SignupPage() {
 
     const supabase = createClient();
 
-    const { data, error } =
-      await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-          },
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
         },
-      });
+      },
+    });
 
     if (error) {
       setError(error.message);
@@ -47,36 +41,27 @@ export default function SignupPage() {
     }
 
     if (!data.user) {
-      setError(
-        "Supabase did not return a user.",
-      );
+      setError("Supabase did not return a user.");
       setLoading(false);
       return;
     }
 
-    const profileResponse =
-      await fetch("/api/auth/profile", {
-        method: "POST",
-      });
+    const profileResponse = await fetch("/api/auth/profile", {
+      method: "POST",
+    });
 
     let profileData: {
       error?: string;
     } = {};
 
     try {
-      profileData =
-        await profileResponse.json();
+      profileData = await profileResponse.json();
     } catch {
       // Ignore invalid/empty response.
     }
 
     if (!profileResponse.ok) {
-      setError(
-        `Profile setup failed: ${
-          profileData.error ??
-          "Unknown error"
-        }`,
-      );
+      setError(`Profile setup failed: ${profileData.error ?? "Unknown error"}`);
       setLoading(false);
       return;
     }
@@ -134,9 +119,7 @@ export default function SignupPage() {
                 type="text"
                 placeholder="Your name"
                 value={name}
-                onChange={(e) =>
-                  setName(e.target.value)
-                }
+                onChange={(e) => setName(e.target.value)}
                 className="
                   w-full
                   rounded-xl
@@ -173,9 +156,7 @@ export default function SignupPage() {
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) =>
-                  setEmail(e.target.value)
-                }
+                onChange={(e) => setEmail(e.target.value)}
                 className="
                   w-full
                   rounded-xl
@@ -212,9 +193,7 @@ export default function SignupPage() {
                 type="password"
                 placeholder="At least 6 characters"
                 value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
+                onChange={(e) => setPassword(e.target.value)}
                 className="
                   w-full
                   rounded-xl
@@ -236,14 +215,26 @@ export default function SignupPage() {
                 autoComplete="new-password"
               />
             </div>
+            <div className="mt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => router.push("/auth/forgot-password")}
+                className="
+      text-xs
+      text-white/45
+      transition
+      hover:text-white/80
+    "
+              >
+                Forgot password?
+              </button>
+            </div>
 
             {/* Error */}
 
             {error && (
               <div className="mt-4 rounded-xl border border-red-400/15 bg-red-400/[0.06] px-4 py-3">
-                <p className="text-sm leading-5 text-red-300">
-                  {error}
-                </p>
+                <p className="text-sm leading-5 text-red-300">{error}</p>
               </div>
             )}
 
@@ -275,18 +266,14 @@ export default function SignupPage() {
                 disabled:hover:translate-y-0
               "
             >
-              {loading
-                ? "Creating account..."
-                : "Create account"}
+              {loading ? "Creating account..." : "Create account"}
             </button>
 
             {/* Login */}
 
             <button
               type="button"
-              onClick={() =>
-                router.push("/auth/login")
-              }
+              onClick={() => router.push("/auth/login")}
               className="
                 mt-5
                 w-full
@@ -298,9 +285,7 @@ export default function SignupPage() {
               "
             >
               Already have an account?{" "}
-              <span className="font-semibold text-white/80">
-                Log in
-              </span>
+              <span className="font-semibold text-white/80">Log in</span>
             </button>
           </form>
         </div>

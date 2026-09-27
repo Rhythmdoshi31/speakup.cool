@@ -14,9 +14,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleLogin(
-    e: FormEvent<HTMLFormElement>,
-  ) {
+  async function handleLogin(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     setLoading(true);
@@ -24,11 +22,10 @@ export default function LoginPage() {
 
     const supabase = createClient();
 
-    const { error } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     if (error) {
       setError(error.message);
@@ -36,17 +33,12 @@ export default function LoginPage() {
       return;
     }
 
-    const profileResponse = await fetch(
-      "/api/auth/profile",
-      {
-        method: "POST",
-      },
-    );
+    const profileResponse = await fetch("/api/auth/profile", {
+      method: "POST",
+    });
 
     if (!profileResponse.ok) {
-      setError(
-        "Logged in, but profile setup failed.",
-      );
+      setError("Logged in, but profile setup failed.");
       setLoading(false);
       return;
     }
@@ -104,9 +96,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) =>
-                  setEmail(e.target.value)
-                }
+                onChange={(e) => setEmail(e.target.value)}
                 className="
                   w-full
                   rounded-xl
@@ -143,9 +133,7 @@ export default function LoginPage() {
                 type="password"
                 placeholder="Your password"
                 value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
+                onChange={(e) => setPassword(e.target.value)}
                 className="
                   w-full
                   rounded-xl
@@ -167,13 +155,25 @@ export default function LoginPage() {
               />
             </div>
 
+            <div className="mt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => router.push("/auth/forgot-password")}
+                className="
+      text-xs
+      text-white/45
+      transition
+      hover:text-white/80
+    "
+              >
+                Forgot password?
+              </button>
+            </div>
             {/* Error */}
 
             {error && (
               <div className="mt-4 rounded-xl border border-red-400/15 bg-red-400/[0.06] px-4 py-3">
-                <p className="text-sm leading-5 text-red-300">
-                  {error}
-                </p>
+                <p className="text-sm leading-5 text-red-300">{error}</p>
               </div>
             )}
 
@@ -205,18 +205,14 @@ export default function LoginPage() {
                 disabled:hover:translate-y-0
               "
             >
-              {loading
-                ? "Logging in..."
-                : "Log in"}
+              {loading ? "Logging in..." : "Log in"}
             </button>
 
             {/* Signup */}
 
             <button
               type="button"
-              onClick={() =>
-                router.push("/auth/signup")
-              }
+              onClick={() => router.push("/auth/signup")}
               className="
                 mt-5
                 w-full
@@ -228,9 +224,7 @@ export default function LoginPage() {
               "
             >
               Don&apos;t have an account?{" "}
-              <span className="font-semibold text-white/80">
-                Sign up
-              </span>
+              <span className="font-semibold text-white/80">Sign up</span>
             </button>
           </form>
         </div>
