@@ -13,6 +13,10 @@ export default function ResetPasswordPage() {
 
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
+
+  const [resetLinkValid, setResetLinkValid] = useState(false);
+  const [resetLinkError, setResetLinkError] = useState(false);
+
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,9 +29,9 @@ export default function ResetPasswordPage() {
       } = await supabase.auth.getSession();
 
       if (!session) {
-        setError(
-          "This password reset link is invalid or has expired.",
-        );
+        setResetLinkError(true);
+      } else {
+        setResetLinkValid(true);
       }
 
       setCheckingSession(false);
@@ -62,7 +66,19 @@ export default function ResetPasswordPage() {
     });
 
     if (error) {
-      setError(error.message);
+      const message = error.message.toLowerCase();
+
+      if (
+        message.includes("different from the old password") ||
+        message.includes("same password")
+      ) {
+        setError(
+          "Your new password must be different from your current password.",
+        );
+      } else {
+        setError(error.message);
+      }
+
       setLoading(false);
       return;
     }
@@ -93,11 +109,77 @@ export default function ResetPasswordPage() {
               sm:p-8
             "
           >
+            {/* Checking reset link */}
+
             {checkingSession ? (
-              <div className="py-8 text-center text-sm text-white/50">
-                Checking reset link...
+              <div className="py-8 text-center">
+                <p className="text-sm text-white/50">
+                  Checking reset link...
+                </p>
               </div>
+            ) : resetLinkError ? (
+              /* Invalid / expired reset link */
+              <>
+                <div className="mb-7">
+                  <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                    Reset link unavailable
+                  </h1>
+
+                  <p className="mt-2 text-sm leading-5 text-white/55">
+                    This password reset link is invalid or has expired.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    router.push("/auth/forgot-password")
+                  }
+                  className="
+                    flex
+                    w-full
+                    items-center
+                    justify-center
+                    rounded-xl
+                    bg-white
+                    px-4
+                    py-3
+                    text-sm
+                    font-bold
+                    text-black
+                    transition-all
+                    duration-200
+                    hover:-translate-y-0.5
+                    hover:bg-white/90
+                    active:scale-[0.98]
+                  "
+                >
+                  Request a new link
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    router.push("/auth/login")
+                  }
+                  className="
+                    mt-5
+                    w-full
+                    text-center
+                    text-sm
+                    text-white/50
+                    transition
+                    hover:text-white/80
+                  "
+                >
+                  Back to{" "}
+                  <span className="font-semibold text-white/80">
+                    Log in
+                  </span>
+                </button>
+              </>
             ) : success ? (
+              /* Password successfully updated */
               <>
                 <div className="mb-7">
                   <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
@@ -111,7 +193,9 @@ export default function ResetPasswordPage() {
 
                 <button
                   type="button"
-                  onClick={() => router.push("/auth/login")}
+                  onClick={() =>
+                    router.push("/auth/login")
+                  }
                   className="
                     flex
                     w-full
@@ -134,44 +218,8 @@ export default function ResetPasswordPage() {
                   Log in
                 </button>
               </>
-            ) : error ? (
-              <>
-                <div className="mb-7">
-                  <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                    Reset link unavailable
-                  </h1>
-
-                  <p className="mt-2 text-sm leading-5 text-white/55">
-                    {error}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => router.push("/auth/forgot-password")}
-                  className="
-                    flex
-                    w-full
-                    items-center
-                    justify-center
-                    rounded-xl
-                    bg-white
-                    px-4
-                    py-3
-                    text-sm
-                    font-bold
-                    text-black
-                    transition-all
-                    duration-200
-                    hover:-translate-y-0.5
-                    hover:bg-white/90
-                    active:scale-[0.98]
-                  "
-                >
-                  Request a new link
-                </button>
-              </>
             ) : (
+              /* Valid reset link */
               <>
                 <div className="mb-7">
                   <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
@@ -182,6 +230,8 @@ export default function ResetPasswordPage() {
                     Choose a new password for your SpeakUp account.
                   </p>
                 </div>
+
+                {/* New password */}
 
                 <div className="space-y-2">
                   <label
@@ -196,7 +246,10 @@ export default function ResetPasswordPage() {
                     type="password"
                     placeholder="At least 6 characters"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setError(null);
+                    }}
                     className="
                       w-full
                       rounded-xl
@@ -218,6 +271,8 @@ export default function ResetPasswordPage() {
                     autoComplete="new-password"
                   />
                 </div>
+
+                {/* Confirm password */}
 
                 <div className="mt-4 space-y-2">
                   <label
@@ -232,9 +287,10 @@ export default function ResetPasswordPage() {
                     type="password"
                     placeholder="Enter your password again"
                     value={confirmPassword}
-                    onChange={(e) =>
-                      setConfirmPassword(e.target.value)
-                    }
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      setError(null);
+                    }}
                     className="
                       w-full
                       rounded-xl
@@ -257,6 +313,8 @@ export default function ResetPasswordPage() {
                   />
                 </div>
 
+                {/* Form error */}
+
                 {error && (
                   <div className="mt-4 rounded-xl border border-red-400/15 bg-red-400/[0.06] px-4 py-3">
                     <p className="text-sm leading-5 text-red-300">
@@ -264,6 +322,8 @@ export default function ResetPasswordPage() {
                     </p>
                   </div>
                 )}
+
+                {/* Update password */}
 
                 <button
                   type="submit"
@@ -294,6 +354,29 @@ export default function ResetPasswordPage() {
                   {loading
                     ? "Updating password..."
                     : "Update password"}
+                </button>
+
+                {/* Back to login */}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    router.push("/auth/login")
+                  }
+                  className="
+                    mt-5
+                    w-full
+                    text-center
+                    text-sm
+                    text-white/50
+                    transition
+                    hover:text-white/80
+                  "
+                >
+                  Back to{" "}
+                  <span className="font-semibold text-white/80">
+                    Log in
+                  </span>
                 </button>
               </>
             )}
