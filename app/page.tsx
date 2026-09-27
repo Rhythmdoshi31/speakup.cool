@@ -184,33 +184,6 @@ export default function Home() {
       {/* ONE gradient instance — never unmounts */}
       <HomeGradient />
 
-      <a
-        href="https://rhythmdoshi.xyz"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="
-    absolute
-    bottom-6
-    right-6
-    z-30
-    text-xs
-    font-medium
-    tracking-wide
-    text-white/55
-    drop-shadow-[0_1px_8px_rgba(0,0,0,0.4)]
-    transition-all
-    duration-200
-    hover:text-white
-    hover:-translate-y-0.5
-  "
-      >
-        Made by{" "}
-        <span className="text-white/95 underline underline-offset-2">
-          Rhythm Doshi
-        </span>{" "}
-        ↗
-      </a>
-
       {/* Home UI */}
       <div className="relative z-10 flex min-h-screen w-full flex-col items-center px-5 pb-10">
         <Navbar streakRefreshKey={streakRefreshKey} />
