@@ -144,31 +144,41 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </div>
 
         <a
-    href="https://rhythmdoshi.xyz"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="
-      fixed
-      bottom-6
-      right-6
-      z-[9999]
-      text-xs
-      font-medium
-      tracking-wide
-      text-white/55
-      drop-shadow-[0_1px_8px_rgba(0,0,0,0.4)]
-      transition-all
-      duration-200
-      hover:-translate-y-0.5
-      hover:text-white
-    "
-  >
-    Made by{" "}
-    <span className="text-white/95 underline underline-offset-2">
-      Rhythm Doshi
-    </span>{" "}
-    ↗
-  </a>
+
+      href="https://rhythmdoshi.xyz"
+
+      target="_blank"
+      rel="noopener noreferrer"
+      className="
+        absolute
+        bottom-4
+        right-4
+        z-[9999]
+        text-xs
+        font-medium
+        tracking-wide
+        text-white/55
+        drop-shadow-[0_1px_8px_rgba(0,0,0,0.4)]
+        transition-all
+        duration-200
+        hover:-translate-y-0.5
+        hover:text-white
+        sm:bottom-6
+        sm:right-6
+      "
+    >
+
+      Made by{" "}
+
+      <span className="text-white/95 underline underline-offset-2">
+
+        Rhythm Doshi
+
+      </span>{" "}
+
+      ↗
+
+    </a>
       </body>
     </html>
   );
