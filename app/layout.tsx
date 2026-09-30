@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/next';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Mulish } from "next/font/google";
@@ -142,7 +143,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <div className="relative z-0 min-h-screen">
           {children}
         </div>
-
+        <Analytics />
         <a
 
       href="https://rhythmdoshi.xyz"
