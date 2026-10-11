@@ -49,10 +49,9 @@ export default function Home() {
 
   const [selectedCategory, setSelectedCategory] = useState<Category>("general");
 
-  const [currentTopic, setCurrentTopic] = useState(() =>
+  const [currentTopic, setCurrentTopic] = useState<string>(() =>
     getRandomTopic("offTheCuff", "general"),
   );
-
   const [spinningTopic, setSpinningTopic] = useState<string | null>(null);
 
   const [isSpinning, setIsSpinning] = useState(false);
