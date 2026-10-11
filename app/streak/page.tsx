@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
-import HomeGradient from "@/components/home/gradient";
-import Navbar from "@/components/home/Navbar";
+// import HomeGradient from "@/components/home/gradient";
+// import Navbar from "@/components/home/Navbar";
 import StreakPage from "@/components/streak/StreakPage";
 
 import { createClient } from "@/lib/supabase/server";
@@ -25,51 +25,42 @@ export default async function StreakRoute() {
     redirect("/auth/login");
   }
 
-  const sessions =
-    await prisma.practiceSession.findMany({
-      where: {
-        userId: user.id,
+  const sessions = await prisma.practiceSession.findMany({
+    where: {
+      userId: user.id,
 
-        // Only completed speaking sessions count.
-        completedAt: {
-          not: null,
-        },
+      // Only completed speaking sessions count.
+      completedAt: {
+        not: null,
       },
+    },
 
-      select: {
-        completedAt: true,
-      },
+    select: {
+      completedAt: true,
+    },
 
-      orderBy: {
-        completedAt: "asc",
-      },
-    });
+    orderBy: {
+      completedAt: "asc",
+    },
+  });
 
   const practiceDates = sessions
     .map((session) => session.completedAt)
-    .filter(
-      (date): date is Date => date !== null,
-    );
+    .filter((date): date is Date => date !== null);
 
-  const currentStreak =
-    calculateCurrentStreak(practiceDates);
+  const currentStreak = calculateCurrentStreak(practiceDates);
 
-  const longestStreak =
-    calculateLongestStreak(practiceDates);
+  const longestStreak = calculateLongestStreak(practiceDates);
 
-  const practicedToday =
-    hasPracticedToday(practiceDates);
+  const practicedToday = hasPracticedToday(practiceDates);
 
-  const week =
-    getWeekDays(practiceDates);
+  const week = getWeekDays(practiceDates);
 
   return (
-    <main className="relative h-screen w-full overflow-hidden">
-      <HomeGradient />
+    <main className="relative h-[calc(100dvh-6rem)] w-full overflow-hidden">
+      {/* <HomeGradient /> */}
 
       <div className="relative z-10 flex h-full w-full flex-col items-center px-5">
-        <Navbar />
-
         <div className="flex w-full flex-1 flex-col items-center">
           <StreakPage
             currentStreak={currentStreak}

@@ -21,9 +21,7 @@ type NavbarProps = {
   streakRefreshKey?: number;
 };
 
-export default function Navbar({
-  streakRefreshKey = 0,
-}: NavbarProps) {
+export default function Navbar({ streakRefreshKey = 0 }: NavbarProps) {
   const pathname = usePathname();
 
   const [auth, setAuth] = useState<AuthData | null>(null);
@@ -56,7 +54,6 @@ export default function Navbar({
     pathname === "/auth/signup" ||
     pathname === "/streak" ||
     pathname === "/profile";
-
 
   return (
     <nav className="flex h-24 w-full max-w-6xl items-center justify-center">
@@ -97,10 +94,20 @@ export default function Navbar({
       )}
 
       {/* Logo */}
-
       <Link
         href="/"
-        className="text-xl font-bold tracking-tight text-white transition-opacity hover:opacity-80 sm:text-2xl"
+        className="
+    absolute
+    left-1/2
+    -translate-x-1/2
+    text-xl
+    font-bold
+    tracking-tight
+    text-white
+    transition-opacity
+    hover:opacity-80
+    sm:text-2xl
+  "
       >
         speakup.cool
       </Link>
@@ -137,13 +144,9 @@ export default function Navbar({
                 active:scale-95
               "
             >
-              <span className="text-[17px] leading-none">
-                🔥
-              </span>
+              <span className="text-[17px] leading-none">🔥</span>
 
-              <span>
-                {auth.currentStreak ?? 0}
-              </span>
+              <span>{auth.currentStreak ?? 0}</span>
             </Link>
 
             {/* Profile */}

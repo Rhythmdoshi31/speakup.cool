@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
-import HomeGradient from "@/components/home/gradient";
-import Navbar from "@/components/home/Navbar";
+// import HomeGradient from "@/components/home/gradient";
+// import Navbar from "@/components/home/Navbar";
 import ProfilePage from "@/components/profile/ProfilePage";
 
 import { createClient } from "@/lib/supabase/server";
@@ -91,29 +91,25 @@ export default async function ProfileRoute() {
     ) + 1;
 
   return (
-    <main className="relative min-h-screen w-full md:h-screen md:overflow-hidden">
-      <HomeGradient />
+  <main className="relative min-h-screen w-full">
+    {/* <HomeGradient /> */}
 
-      <div className="relative z-10 flex min-h-screen w-full flex-col items-center px-5 md:h-screen">
-        <Navbar />
-
-        <div className="flex h-full min-h-0 w-full flex-1 flex-col items-center">
-          <ProfilePage
-            name={profile.name}
-            email={profile.email}
-            currentStreak={currentStreak}
-            longestStreak={longestStreak}
-            totalSessions={totalSessions}
-            totalSpeakingSeconds={
-              totalSpeakingSeconds
-            }
-            sessions={recentSessions}
-            leaderboard={leaderboard}
-            currentUserRank={currentUserRank}
-            currentUserId={user.id}
-          />
-        </div>
+    <div className="relative z-10 flex min-h-screen w-full flex-col items-center px-5">
+      <div className="flex h-full min-h-0 w-full flex-1 flex-col items-center">
+        <ProfilePage
+          name={profile.name}
+          email={profile.email}
+          currentStreak={currentStreak}
+          longestStreak={longestStreak}
+          totalSessions={totalSessions}
+          totalSpeakingSeconds={totalSpeakingSeconds}
+          sessions={recentSessions}
+          leaderboard={leaderboard}
+          currentUserRank={currentUserRank}
+          currentUserId={user.id}
+        />
       </div>
-    </main>
-  );
+    </div>
+  </main>
+);
 }

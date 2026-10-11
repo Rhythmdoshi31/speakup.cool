@@ -1,9 +1,10 @@
-import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Mulish } from "next/font/google";
 import HomeGradient from "@/components/home/gradient";
+import AppShell from "@/components/home/AppShell";
 import "./globals.css";
 
 const mulish = Mulish({
@@ -141,18 +142,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </div>
 
         {/* Page content */}
-        <div className="relative z-0 min-h-screen">
-          {children}
-        </div>
+        {/* Shared Navbar and page content */}
+        <AppShell>{children}</AppShell>
         <Analytics />
         <SpeedInsights />
         <a
-
-      href="https://rhythmdoshi.xyz"
-
-      target="_blank"
-      rel="noopener noreferrer"
-      className="
+          href="https://rhythmdoshi.xyz"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="
         absolute
         bottom-4
         right-4
@@ -169,19 +167,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         sm:bottom-6
         sm:right-6
       "
-    >
-
-      Made by{" "}
-
-      <span className="text-white/95 underline underline-offset-2">
-
-        Rhythm Doshi
-
-      </span>{" "}
-
-      ↗
-
-    </a>
+        >
+          Made by{" "}
+          <span className="text-white/95 underline underline-offset-2">
+            Rhythm Doshi
+          </span>{" "}
+          ↗
+        </a>
       </body>
     </html>
   );

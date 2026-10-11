@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 
-import HomeGradient from "../components/home/gradient";
+// import HomeGradient from "../components/home/gradient";
 
-import Navbar from "../components/home/Navbar";
+// import Navbar from "../components/home/Navbar";
+import { useStreakRefresh } from "@/components/home/AppShell";
 import ModeSelector from "../components/home/ModeSelector";
 import CategorySelector from "../components/home/CategorySelector";
 import TopicDisplay from "../components/home/TopicDisplay";
@@ -80,7 +81,8 @@ export default function Home() {
 
   const [isSoundMuted, setIsSoundMuted] = useState(true);
 
-  const [streakRefreshKey, setStreakRefreshKey] = useState(0);
+  // const [streakRefreshKey, setStreakRefreshKey] = useState(0);
+  const { refreshStreak } = useStreakRefresh();
 
   function changeMode(mode: Mode) {
     cancelSpin();
@@ -173,7 +175,7 @@ export default function Home() {
   }
 
   return (
-    <main className="relative min-h-screen w-full overflow-hidden">
+    <main className="relative min-h-[calc(100dvh-6rem)] w-full overflow-hidden">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -182,11 +184,11 @@ export default function Home() {
       />
 
       {/* ONE gradient instance — never unmounts */}
-      <HomeGradient />
+      {/* <HomeGradient /> */}
 
       {/* Home UI */}
-      <div className="relative z-10 flex min-h-screen w-full flex-col items-center px-5 pb-10">
-        <Navbar streakRefreshKey={streakRefreshKey} />
+      <div className="relative z-10 flex min-h-[calc(100dvh-6rem)] w-full flex-col items-center px-5 pb-10">
+        {/* <Navbar streakRefreshKey={streakRefreshKey} /> */}
 
         {/* Everything below navbar disappears during timer */}
         <div
@@ -261,7 +263,7 @@ export default function Home() {
             type={timerType}
             mode={selectedMode}
             category={selectedCategory}
-            onSessionComplete={() => setStreakRefreshKey((value) => value + 1)}
+            onSessionComplete={refreshStreak}
             speechTime={speechTime}
             debateSide={debateSide}
             isDebate={selectedMode === "debate"}
