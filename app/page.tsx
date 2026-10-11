@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 // import HomeGradient from "../components/home/gradient";
 
@@ -22,11 +22,11 @@ import {
   type Mode,
 } from "../data/topics";
 
-type TimerScreenProps = {
-  topic: string;
-  initialTime?: number;
-  onExit: () => void;
-};
+// type TimerScreenProps = {
+//   topic: string;
+//   initialTime?: number;
+//   onExit: () => void;
+// };
 
 export default function Home() {
   const jsonLd = {
@@ -49,13 +49,9 @@ export default function Home() {
 
   const [selectedCategory, setSelectedCategory] = useState<Category>("general");
 
-  const [currentTopic, setCurrentTopic] = useState(
-    topics.offTheCuff.general[0],
+  const [currentTopic, setCurrentTopic] = useState(() =>
+    getRandomTopic("offTheCuff", "general"),
   );
-
-  useEffect(() => {
-    setCurrentTopic(getRandomTopic("offTheCuff", "general"));
-  }, []);
 
   const [spinningTopic, setSpinningTopic] = useState<string | null>(null);
 
