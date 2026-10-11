@@ -42,6 +42,7 @@ export default async function ProfileRoute() {
         orderBy: {
           completedAt: "desc",
         },
+        take: 5
       }),
 
       getStreakLeaderboard(user.id),
@@ -73,7 +74,6 @@ export default async function ProfileRoute() {
     );
 
   const recentSessions = sessions
-    .slice(0, 10)
     .map((session) => ({
       id: session.id,
       topic: session.topic,

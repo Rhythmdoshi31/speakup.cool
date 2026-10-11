@@ -205,7 +205,10 @@ export async function getCurrentStreak(
       orderBy: {
         completedAt: "desc",
       },
+      take: 5
     });
+
+  console.log("CURRENT STREAK SESSIONS FETCHED:", sessions.length);
 
   const practiceDates = sessions
     .map((session) => session.completedAt)
@@ -245,6 +248,7 @@ export async function getStreakLeaderboard(
           orderBy: {
             completedAt: "desc",
           },
+          take: 5
         },
       },
     });
