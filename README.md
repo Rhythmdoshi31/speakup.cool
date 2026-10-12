@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SpeakUp 🎙️
 
-## Getting Started
+### Think. Speak. Convince.
 
-First, run the development server:
+**SpeakUp** is a public speaking practice platform designed to help you think on your feet, improve articulation, build confidence, and become a better communicator.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+🌐 **Live Website:** https://speakup.cool
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Multiple Speaking Modes:** Practice impromptu speaking, debates, persuasion, and deep research.
+- **Random Topic Generator:** Discover new topics across different categories.
+- **Customizable Timer:** Configure speaking and research durations.
+- **Daily Streaks:** Build consistency and track your speaking habits.
+- **Personal Statistics:** Track total sessions, speaking time, and practice history.
+- **Leaderboard:** Compare streaks with other users.
+- **Authentication:** Secure user authentication powered by Supabase.
+- **Responsive UI:** Minimal dark interface with interactive components and smooth transitions.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Tech Stack
 
-## Learn More
+- **Frontend:** Next.js, React, TypeScript, Tailwind CSS
+- **Backend:** Next.js Server Components and Route Handlers
+- **Database:** PostgreSQL
+- **ORM:** Prisma
+- **Authentication:** Supabase Auth
+- **Deployment:** Vercel
+- **Monitoring:** Vercel Analytics and Speed Insights
 
-To learn more about Next.js, take a look at the following resources:
+## 🏗️ Architecture
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+SpeakUp uses Next.js for server-side rendering and application logic. Prisma handles database operations, PostgreSQL stores user and practice data, and Supabase manages authentication.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Server Components retrieve data directly from the database, while Client Components power interactive features such as timers, topic selection, and settings.
 
-## Deploy on Vercel
+## 🚀 Getting Started
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Prerequisites
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Node.js and npm
+- A Supabase project
+- A PostgreSQL database
+
+### Installation
+
+1. Clone the repository:
+
+   `git clone <YOUR_REPOSITORY_URL>`
+
+2. Navigate to the project directory:
+
+   `cd speakup`
+
+3. Install dependencies:
+
+   `npm install`
+
+4. Create a `.env` file and configure the environment variables required by your Prisma and Supabase setup.
+
+5. Generate Prisma Client:
+
+   `npx prisma generate`
+
+6. Apply existing database migrations:
+
+   `npx prisma migrate deploy`
+
+7. Start the development server:
+
+   `npm run dev`
+
+8. Open http://localhost:3000 in your browser.
+
+**Note:** Never commit your `.env` file or expose database credentials and secret keys.
+
+## 🎯 Vision
+
+SpeakUp aims to make communication practice engaging and accessible through timed speaking exercises, debates, persuasive challenges, and consistent progress tracking.
+
+The goal is simple: **Think clearly. Speak confidently. Convince effectively.**
+
+## 👨‍💻 Author
+
+**Rhythm Doshi**
+
+- Portfolio: https://rhythmdoshi.xyz
+- Website: https://speakup.cool
