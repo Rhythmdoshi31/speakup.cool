@@ -18,25 +18,29 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
+    try {
+      const supabase = createClient();
 
-    const redirectTo = `${window.location.origin}/auth/callback`;
+      const redirectTo = `${window.location.origin}/auth/callback?next=/auth/reset-password`;
 
-    const { error } = await supabase.auth.resetPasswordForEmail(
-      email,
-      {
-        redirectTo,
-      },
-    );
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        email.trim(),
+        {
+          redirectTo,
+        },
+      );
 
-    if (error) {
-      setError(error.message);
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
+      setSent(true);
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setSent(true);
-    setLoading(false);
   }
 
   return (
@@ -62,6 +66,8 @@ export default function ForgotPasswordPage() {
           >
             {!sent ? (
               <>
+                {/* Header */}
+
                 <div className="mb-7">
                   <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                     Forgot your password?
@@ -72,6 +78,8 @@ export default function ForgotPasswordPage() {
                     your password.
                   </p>
                 </div>
+
+                {/* Email */}
 
                 <div className="space-y-2">
                   <label
@@ -108,6 +116,8 @@ export default function ForgotPasswordPage() {
                   />
                 </div>
 
+                {/* Error */}
+
                 {error && (
                   <div className="mt-4 rounded-xl border border-red-400/15 bg-red-400/[0.06] px-4 py-3">
                     <p className="text-sm leading-5 text-red-300">
@@ -115,6 +125,8 @@ export default function ForgotPasswordPage() {
                     </p>
                   </div>
                 )}
+
+                {/* Submit */}
 
                 <button
                   type="submit"
@@ -145,6 +157,8 @@ export default function ForgotPasswordPage() {
                   {loading ? "Sending..." : "Send reset link"}
                 </button>
 
+                {/* Back to Login */}
+
                 <button
                   type="button"
                   onClick={() => router.push("/auth/login")}
@@ -166,14 +180,24 @@ export default function ForgotPasswordPage() {
               </>
             ) : (
               <>
+                {/* Success */}
+
                 <div className="mb-7">
                   <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                     Check your email
                   </h1>
 
-                  <p className="mt-2 text-sm leading-5 text-white/55">
+                  <p className="mt-3 text-sm leading-6 text-white/60">
                     If an account exists with that email, we&apos;ve sent you
                     a link to reset your password.
+                  </p>
+
+                  <p className="mt-3 break-all text-sm font-semibold text-white">
+                    {email.trim()}
+                  </p>
+
+                  <p className="mt-3 text-sm leading-6 text-white/50">
+                    Check your inbox and spam folder for the reset email.
                   </p>
                 </div>
 
@@ -200,6 +224,25 @@ export default function ForgotPasswordPage() {
                   "
                 >
                   Back to log in
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSent(false);
+                    setError(null);
+                  }}
+                  className="
+                    mt-4
+                    w-full
+                    text-center
+                    text-sm
+                    text-white/50
+                    transition
+                    hover:text-white/80
+                  "
+                >
+                  Try another email
                 </button>
               </>
             )}
