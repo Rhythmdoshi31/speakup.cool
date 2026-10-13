@@ -10,9 +10,8 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
-
+  const [emailSent, setEmailSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSignup(e: FormEvent<HTMLFormElement>) {
@@ -21,74 +20,121 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
-        },
-      },
-    });
-
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      return;
-    }
-
-    if (!data.user) {
-      setError("Supabase did not return a user.");
-      setLoading(false);
-      return;
-    }
-
-    const profileResponse = await fetch("/api/auth/profile", {
-      method: "POST",
-    });
-
-    let profileData: {
-      error?: string;
-    } = {};
-
     try {
-      profileData = await profileResponse.json();
+      const supabase = createClient();
+
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: {
+            name: name.trim(),
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/`,
+        },
+      });
+
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
+      if (!data.user) {
+        setError("Unable to create your account. Please try again.");
+        return;
+      }
+
+      if (!data.session) {
+        setEmailSent(true);
+        return;
+      }
+
+      const profileResponse = await fetch("/api/auth/profile", {
+        method: "POST",
+      });
+
+      if (!profileResponse.ok) {
+        let message = "Unknown error";
+
+        try {
+          const profileData = await profileResponse.json();
+          message = profileData.error ?? message;
+        } catch {
+          // Keep the fallback message.
+        }
+
+        setError(`Profile setup failed: ${message}`);
+        return;
+      }
+
+      router.replace("/");
+      router.refresh();
     } catch {
-      // Ignore invalid/empty response.
-    }
-
-    if (!profileResponse.ok) {
-      setError(`Profile setup failed: ${profileData.error ?? "Unknown error"}`);
+      setError("Something went wrong. Please try again.");
+    } finally {
       setLoading(false);
-      return;
     }
+  }
 
-    router.push("/");
-    router.refresh();
+  if (emailSent) {
+    return (
+      <main className="min-h-screen w-full">
+        <div className="flex min-h-screen w-full flex-col items-center px-5">
+          <div className="flex w-full flex-1 items-center justify-center pb-16">
+            <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/[0.05] p-6 shadow-2xl shadow-black/10 backdrop-blur-md sm:p-8">
+              <div className="mb-7">
+                <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                  Check your email
+                </h1>
+
+                <p className="mt-3 text-sm leading-6 text-white/60">
+                  We&apos;ve sent a verification link to:
+                </p>
+
+                <p className="mt-2 break-all text-sm font-semibold text-white">
+                  {email.trim()}
+                </p>
+
+                <p className="mt-4 text-sm leading-6 text-white/60">
+                  Verify your email address to complete your SpeakUp
+                  registration. If you don&apos;t see the email, check your
+                  spam folder.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => router.push("/auth/login")}
+                className="flex w-full items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-bold text-black transition hover:bg-white/90 active:scale-[0.98]"
+              >
+                Go to login
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setEmailSent(false);
+                  setPassword("");
+                  setError(null);
+                }}
+                className="mt-4 w-full text-center text-sm text-white/50 transition hover:text-white/80"
+              >
+                Back to sign up
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   return (
     <main className="min-h-screen w-full">
       <div className="flex min-h-screen w-full flex-col items-center px-5">
-
         <div className="flex w-full flex-1 items-center justify-center pb-16">
           <form
             onSubmit={handleSignup}
-            className="
-              w-full
-              max-w-md
-              rounded-3xl
-              border
-              border-white/10
-              bg-white/[0.05]
-              p-6
-              shadow-2xl
-              shadow-black/10
-              backdrop-blur-md
-              sm:p-8
-            "
+            className="w-full max-w-md rounded-3xl border border-white/10 bg-white/[0.05] p-6 shadow-2xl shadow-black/10 backdrop-blur-md sm:p-8"
           >
             {/* Header */}
 
@@ -118,22 +164,7 @@ export default function SignupPage() {
                 placeholder="Your name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="
-                  w-full
-                  rounded-xl
-                  border
-                  border-white/10
-                  bg-white/[0.06]
-                  px-4
-                  py-3
-                  text-sm
-                  text-white
-                  outline-none
-                  placeholder:text-white/30
-                  transition
-                  focus:border-white/25
-                  focus:bg-white/[0.08]
-                "
+                className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 transition focus:border-white/25 focus:bg-white/[0.08]"
                 required
                 autoComplete="name"
               />
@@ -155,22 +186,7 @@ export default function SignupPage() {
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="
-                  w-full
-                  rounded-xl
-                  border
-                  border-white/10
-                  bg-white/[0.06]
-                  px-4
-                  py-3
-                  text-sm
-                  text-white
-                  outline-none
-                  placeholder:text-white/30
-                  transition
-                  focus:border-white/25
-                  focus:bg-white/[0.08]
-                "
+                className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 transition focus:border-white/25 focus:bg-white/[0.08]"
                 required
                 autoComplete="email"
               />
@@ -192,37 +208,20 @@ export default function SignupPage() {
                 placeholder="At least 6 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="
-                  w-full
-                  rounded-xl
-                  border
-                  border-white/10
-                  bg-white/[0.06]
-                  px-4
-                  py-3
-                  text-sm
-                  text-white
-                  outline-none
-                  placeholder:text-white/30
-                  transition
-                  focus:border-white/25
-                  focus:bg-white/[0.08]
-                "
+                className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 transition focus:border-white/25 focus:bg-white/[0.08]"
                 required
                 minLength={6}
                 autoComplete="new-password"
               />
             </div>
+
+            {/* Forgot password */}
+
             <div className="mt-2 flex justify-end">
               <button
                 type="button"
                 onClick={() => router.push("/auth/forgot-password")}
-                className="
-      text-xs
-      text-white/45
-      transition
-      hover:text-white/80
-    "
+                className="text-xs text-white/45 transition hover:text-white/80"
               >
                 Forgot password?
               </button>
@@ -241,28 +240,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="
-                mt-6
-                flex
-                w-full
-                items-center
-                justify-center
-                rounded-xl
-                bg-white
-                px-4
-                py-3
-                text-sm
-                font-bold
-                text-black
-                transition-all
-                duration-200
-                hover:-translate-y-0.5
-                hover:bg-white/90
-                active:scale-[0.98]
-                disabled:cursor-not-allowed
-                disabled:opacity-50
-                disabled:hover:translate-y-0
-              "
+              className="mt-6 flex w-full items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-bold text-black transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
             >
               {loading ? "Creating account..." : "Create account"}
             </button>
@@ -272,15 +250,7 @@ export default function SignupPage() {
             <button
               type="button"
               onClick={() => router.push("/auth/login")}
-              className="
-                mt-5
-                w-full
-                text-center
-                text-sm
-                text-white/50
-                transition
-                hover:text-white/80
-              "
+              className="mt-5 w-full text-center text-sm text-white/50 transition hover:text-white/80"
             >
               Already have an account?{" "}
               <span className="font-semibold text-white/80">Log in</span>
