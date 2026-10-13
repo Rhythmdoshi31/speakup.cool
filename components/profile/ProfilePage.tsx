@@ -185,30 +185,44 @@ export default function ProfilePage({
           </div>
         </div>
 
-        <form action="/api/auth/logout" method="POST">
-          <button
-            type="submit"
-            className="
-              rounded-xl
-              border
-              border-white/15
-              bg-white/[0.06]
-              px-3.5
-              py-2
-              text-xs
-              font-semibold
-              text-white/70
-              transition
-              hover:border-white/25
-              hover:bg-white/[0.1]
-              hover:text-white
-              sm:px-4
-              sm:text-sm
-            "
-          >
-            Logout
-          </button>
-        </form>
+        <button
+            type="button"
+            onClick={async () => {
+          try {
+          const response = await fetch("/api/auth/logout", {
+            method: "POST",
+            cache: "no-store",
+          });
+
+          if (!response.ok) {
+            throw new Error("Logout failed");
+          }
+
+          window.location.replace("/");
+        } catch (error) {
+          console.error("Logout error:", error);
+        }
+      }}
+      className="
+    rounded-xl
+    border
+    border-white/15
+    bg-white/[0.06]
+    px-3.5
+    py-2
+    text-xs
+    font-semibold
+    text-white/70
+    transition
+    hover:border-white/25
+    hover:bg-white/[0.1]
+    hover:text-white
+    sm:px-4
+    sm:text-sm
+  "
+    >
+      Logout
+    </button>
       </div>
 
       {/* =========================================================
