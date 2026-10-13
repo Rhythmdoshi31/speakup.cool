@@ -13,7 +13,7 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  
   async function handleSignup(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
