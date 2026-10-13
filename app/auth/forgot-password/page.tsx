@@ -3,7 +3,6 @@
 import { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/home/Navbar";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -43,7 +42,6 @@ export default function ForgotPasswordPage() {
   return (
     <main className="min-h-screen w-full">
       <div className="flex min-h-screen w-full flex-col items-center px-5">
-        <Navbar />
 
         <div className="flex w-full flex-1 items-center justify-center pb-16">
           <form
