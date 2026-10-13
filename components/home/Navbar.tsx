@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, UserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 type UserData = {
   id: string;
@@ -27,7 +28,57 @@ export default function Navbar({ streakRefreshKey = 0 }: NavbarProps) {
   const [auth, setAuth] = useState<AuthData | null>(null);
 
   useEffect(() => {
+    let mounted = true;
+
     async function loadUser() {
+      try {
+        const response = await fetch("/api/auth/me", {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          if (mounted) {
+            setAuth({ authenticated: false });
+          }
+          return;
+        }
+
+        const data: AuthData = await response.json();
+
+        if (mounted) {
+          setAuth(data);
+        }
+      } catch {
+        if (mounted) {
+          setAuth({ authenticated: false });
+        }
+      }
+    }
+
+    loadUser();
+
+    return () => {
+      mounted = false;
+    };
+  }, [streakRefreshKey]);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+        // Fetch the latest server-side authentication state.
+        // Defer the request to avoid making Supabase calls
+        // directly inside the auth-state callback.
+        setTimeout(() => {
+          loadAuthState();
+        }, 0);
+      }
+    });
+
+    async function loadAuthState() {
       try {
         const response = await fetch("/api/auth/me", {
           cache: "no-store",
@@ -38,7 +89,7 @@ export default function Navbar({ streakRefreshKey = 0 }: NavbarProps) {
           return;
         }
 
-        const data = await response.json();
+        const data: AuthData = await response.json();
 
         setAuth(data);
       } catch {
@@ -46,18 +97,21 @@ export default function Navbar({ streakRefreshKey = 0 }: NavbarProps) {
       }
     }
 
-    loadUser();
-  }, [streakRefreshKey]);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const showBackButton =
     pathname === "/auth/login" ||
     pathname === "/auth/signup" ||
     pathname === "/streak" ||
-    pathname === "/profile";
+    pathname === "/profile" ||
+    pathname === "/auth/forgot-password";
 
   return (
     <nav className="flex h-24 w-full max-w-6xl items-center justify-center">
-      {/* Back button - auth pages only */}
+      {/* Back button */}
 
       {showBackButton && (
         <Link
@@ -66,7 +120,6 @@ export default function Navbar({ streakRefreshKey = 0 }: NavbarProps) {
           className="
             absolute
             left-5
-            sm:left-8
             flex
             h-10
             items-center
@@ -86,6 +139,7 @@ export default function Navbar({ streakRefreshKey = 0 }: NavbarProps) {
             hover:bg-white/[0.1]
             hover:text-white
             active:scale-95
+            sm:left-8
           "
         >
           <ArrowLeft size={17} strokeWidth={2} />
@@ -94,20 +148,21 @@ export default function Navbar({ streakRefreshKey = 0 }: NavbarProps) {
       )}
 
       {/* Logo */}
+
       <Link
         href="/"
         className="
-    absolute
-    left-1/2
-    -translate-x-1/2
-    text-xl
-    font-bold
-    tracking-tight
-    text-white
-    transition-opacity
-    hover:opacity-80
-    sm:text-2xl
-  "
+          absolute
+          left-1/2
+          -translate-x-1/2
+          text-xl
+          font-bold
+          tracking-tight
+          text-white
+          transition-opacity
+          hover:opacity-80
+          sm:text-2xl
+        "
       >
         speakup.cool
       </Link>
@@ -145,7 +200,6 @@ export default function Navbar({ streakRefreshKey = 0 }: NavbarProps) {
               "
             >
               <span className="text-[17px] leading-none">🔥</span>
-
               <span>{auth.currentStreak ?? 0}</span>
             </Link>
 
