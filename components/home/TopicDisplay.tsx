@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { createUISFX } from "uisfx";
 
 interface TopicDisplayProps {
@@ -8,6 +13,14 @@ interface TopicDisplayProps {
   finalTopic: string | null;
   topics: string[];
   isSpinning: boolean;
+  isSoundMuted: boolean;
+  onSpinComplete: () => void;
+}
+
+interface SpinAnimationProps {
+  topic: string;
+  finalTopic: string;
+  topics: string[];
   isSoundMuted: boolean;
   onSpinComplete: () => void;
 }
@@ -29,22 +42,6 @@ function createSpinSequence(
   oldTopic: string,
   finalTopic: string,
 ): string[] {
-  /*
-   * Remove both the old topic and final topic.
-   *
-   * This is important:
-   *
-   * OLD TOPIC
-   *    ↓
-   * random topic
-   *    ↓
-   * random topic
-   *    ↓
-   * FINAL TOPIC
-   *
-   * We don't want the final topic appearing early.
-   */
-
   const available = topics.filter(
     (item) => item !== oldTopic && item !== finalTopic,
   );
@@ -53,35 +50,9 @@ function createSpinSequence(
     return [finalTopic];
   }
 
-  /*
-   * Create a completely fresh shuffle for every spin.
-   */
-
   const shuffled = shuffle(available);
-
-  /*
-   * We want enough visual changes to make the spinner feel
-   * like it is actually dealing topics.
-   *
-   * Use at most 20 random topics.
-   */
-
-  const randomCount = Math.min(
-    shuffled.length,
-    20,
-  );
-
+  const randomCount = Math.min(shuffled.length, 20);
   const sequence = shuffled.slice(0, randomCount);
-
-  /*
-   * The final topic is explicitly part of the animation.
-   *
-   * Therefore there is no sudden:
-   *
-   * random topic → new topic
-   *
-   * after the animation finishes.
-   */
 
   sequence.push(finalTopic);
 
@@ -92,23 +63,27 @@ const ui = createUISFX({
   pack: "minimal",
 });
 
-export default function TopicDisplay({
+function SpinAnimation({
   topic,
   finalTopic,
   topics,
-  isSpinning,
   isSoundMuted,
   onSpinComplete,
-}: TopicDisplayProps) {
-  const [displayTopic, setDisplayTopic] =
-    useState(topic);
+}: SpinAnimationProps) {
+  const [displayTopic, setDisplayTopic] = useState(topic);
 
-  const previousSpinning = useRef(false);
   const soundMutedRef = useRef(isSoundMuted);
   const onSpinCompleteRef = useRef(onSpinComplete);
+  const tickAudioRef = useRef<HTMLAudioElement | null>(null);
+  const completedRef = useRef(false);
 
   useEffect(() => {
     soundMutedRef.current = isSoundMuted;
+
+    if (isSoundMuted && tickAudioRef.current) {
+      tickAudioRef.current.pause();
+      tickAudioRef.current.currentTime = 0;
+    }
   }, [isSoundMuted]);
 
   useEffect(() => {
@@ -116,42 +91,40 @@ export default function TopicDisplay({
   }, [onSpinComplete]);
 
   useEffect(() => {
-    /*
-     * When we're not spinning, simply show the current topic.
-     */
+    const audio = new Audio("/ticking.mp3");
+    audio.preload = "auto";
+    audio.volume = 0.65;
 
-    if (!isSpinning) {
-      previousSpinning.current = false;
-      setDisplayTopic(topic);
-      return;
-    }
+    tickAudioRef.current = audio;
 
-    /*
-     * Prevent this effect from starting twice for the
-     * same spin.
-     */
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+      tickAudioRef.current = null;
+    };
+  }, []);
 
-    if (previousSpinning.current) {
-      return;
-    }
+  const playTick = useCallback(() => {
+    if (soundMutedRef.current) return;
 
-    previousSpinning.current = true;
+    const audio = tickAudioRef.current;
+    if (!audio) return;
 
-    if (!finalTopic || topics.length === 0) {
-      setDisplayTopic(topic);
-      previousSpinning.current = false;
-      return;
-    }
+    audio.currentTime = 0;
+    void audio.play().catch(() => {});
+  }, []);
 
+  const stopTick = useCallback(() => {
+    const audio = tickAudioRef.current;
+    if (!audio) return;
+
+    audio.pause();
+    audio.currentTime = 0;
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
-
     const timeoutIds: number[] = [];
-
-    /*
-     * Create ONE random sequence for this spin.
-     *
-     * It is created only once.
-     */
 
     const sequence = createSpinSequence(
       topics,
@@ -159,60 +132,45 @@ export default function TopicDisplay({
       finalTopic,
     );
 
-    /*
-     * Fast → slow.
-     *
-     * Starts quickly and gradually slows down.
-     */
-
     const timings = sequence.map((_, index) => {
       const progress =
         index / Math.max(sequence.length - 1, 1);
 
-      /*
-       * Cubic easing.
-       *
-       * 0 → fast
-       * 1 → slow
-       */
-
-      const eased = progress ** 3;
-
-      return Math.round(
-        75 + eased * 500,
-      );
+      return Math.round(75 + progress ** 3 * 500);
     });
 
     let currentIndex = 0;
 
     const showNextTopic = () => {
       if (cancelled) return;
-    
+
       const nextTopic = sequence[currentIndex];
-    
       const isFinalTopic =
         currentIndex === sequence.length - 1;
-    
+
       setDisplayTopic(nextTopic);
-    
+      playTick();
+
       if (isFinalTopic) {
+        stopTick();
+
         if (!soundMutedRef.current) {
           ui.play("bonus");
         }
-    
-        onSpinCompleteRef.current();
+
+        if (!completedRef.current) {
+          completedRef.current = true;
+          onSpinCompleteRef.current();
+        }
+
         return;
       }
-    
-      const delay = timings[currentIndex];
-    
-      currentIndex++;
-    
-      const timeout = window.setTimeout(
-        showNextTopic,
-        delay,
-      );
-    
+
+      const timeout = window.setTimeout(() => {
+        currentIndex++;
+        showNextTopic();
+      }, timings[currentIndex]);
+
       timeoutIds.push(timeout);
     };
 
@@ -224,29 +182,50 @@ export default function TopicDisplay({
       timeoutIds.forEach((timeout) => {
         window.clearTimeout(timeout);
       });
-    };
 
-    /*
-     * VERY IMPORTANT:
-     *
-     * Do NOT put displayTopic in this dependency array.
-     *
-     * Changing displayTopic is part of the animation.
-     * It must NOT restart the animation.
-     */
+      stopTick();
+    };
   }, [
-    isSpinning,
+    topic,
     finalTopic,
     topics,
-    topic,
+    playTick,
+    stopTick,
   ]);
 
   return (
+    <p
+      key={displayTopic}
+      className="
+        max-w-4xl
+        text-center
+        text-2xl
+        font-bold
+        leading-[1.15]
+        tracking-tight
+        text-white
+        sm:text-4xl
+        md:text-5xl
+        lg:text-6xl
+      "
+    >
+      {displayTopic}
+    </p>
+  );
+}
+
+export default function TopicDisplay({
+  topic,
+  finalTopic,
+  topics,
+  isSpinning,
+  isSoundMuted,
+  onSpinComplete,
+}: TopicDisplayProps) {
+  return (
     <div className="flex w-full flex-col items-center">
       <p className="mb-3 text-sm tracking-wide text-white/45 sm:text-base">
-        {isSpinning
-          ? "Dealing..."
-          : "Your topic"}
+        {isSpinning ? "Dealing..." : "Your topic"}
       </p>
 
       <div
@@ -263,23 +242,33 @@ export default function TopicDisplay({
           sm:px-6
         "
       >
-        <p
-          key={displayTopic}
-          className="
-            max-w-4xl
-            text-center
-            text-2xl
-            font-bold
-            leading-[1.15]
-            tracking-tight
-            text-white
-            sm:text-4xl
-            md:text-5xl
-            lg:text-6xl
-          "
-        >
-          {displayTopic}
-        </p>
+        {isSpinning && finalTopic ? (
+          <SpinAnimation
+            key={`${topic}-${finalTopic}`}
+            topic={topic}
+            finalTopic={finalTopic}
+            topics={topics}
+            isSoundMuted={isSoundMuted}
+            onSpinComplete={onSpinComplete}
+          />
+        ) : (
+          <p
+            className="
+              max-w-4xl
+              text-center
+              text-2xl
+              font-bold
+              leading-[1.15]
+              tracking-tight
+              text-white
+              sm:text-4xl
+              md:text-5xl
+              lg:text-6xl
+            "
+          >
+            {topic}
+          </p>
+        )}
       </div>
     </div>
   );
