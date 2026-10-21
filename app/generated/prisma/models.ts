@@ -11,4 +11,5 @@
 export type * from './models/User'
 export type * from './models/PracticeSession'
 export type * from './models/SavedTopic'
+export type * from './models/UserStreak'
 export type * from './commonInputTypes'

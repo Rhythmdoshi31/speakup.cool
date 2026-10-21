@@ -53,7 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   PracticeSession: 'PracticeSession',
-  SavedTopic: 'SavedTopic'
+  SavedTopic: 'SavedTopic',
+  UserStreak: 'UserStreak'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -107,6 +108,17 @@ export const SavedTopicScalarFieldEnum = {
 } as const
 
 export type SavedTopicScalarFieldEnum = (typeof SavedTopicScalarFieldEnum)[keyof typeof SavedTopicScalarFieldEnum]
+
+
+export const UserStreakScalarFieldEnum = {
+  userId: 'userId',
+  currentStreak: 'currentStreak',
+  longestStreak: 'longestStreak',
+  lastPracticeDate: 'lastPracticeDate',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserStreakScalarFieldEnum = (typeof UserStreakScalarFieldEnum)[keyof typeof UserStreakScalarFieldEnum]
 
 
 export const SortOrder = {

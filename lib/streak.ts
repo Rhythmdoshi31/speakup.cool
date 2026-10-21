@@ -1,3 +1,5 @@
+import { getUserStreak } from "@/lib/streak/streak.service";
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /*
@@ -186,39 +188,9 @@ export function getWeekDays(
 
 import { prisma } from "@/lib/prisma";
 
-export async function getCurrentStreak(
-  userId: string,
-) {
-  const sessions =
-    await prisma.practiceSession.findMany({
-      where: {
-        userId,
-        completedAt: {
-          not: null,
-        },
-      },
-
-      select: {
-        completedAt: true,
-      },
-
-      orderBy: {
-        completedAt: "desc",
-      },
-      take: 5
-    });
-
-  console.log("CURRENT STREAK SESSIONS FETCHED:", sessions.length);
-
-  const practiceDates = sessions
-    .map((session) => session.completedAt)
-    .filter(
-      (date): date is Date => date !== null,
-    );
-
-  return calculateCurrentStreak(
-    practiceDates,
-  );
+export async function getCurrentStreak(userId: string) {
+  const streak = await getUserStreak(userId);
+  return streak.currentStreak;
 }
 
 export type LeaderboardEntry = {
@@ -228,44 +200,53 @@ export type LeaderboardEntry = {
   rank: number;
 };
 
+
 export async function getStreakLeaderboard(
   currentUserId: string,
 ) {
-  const users =
-    await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        practiceSessions: {
-          where: {
-            completedAt: {
-              not: null,
-            },
-          },
-          select: {
-            completedAt: true,
-          },
-          orderBy: {
-            completedAt: "desc",
-          },
-          take: 5
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      streak: {
+        select: {
+          currentStreak: true,
+          lastPracticeDate: true,
         },
       },
-    });
+    },
+  });
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
 
   const entries = users.map((user) => {
-    const practiceDates = user.practiceSessions
-      .map((session) => session.completedAt)
-      .filter(
-        (date): date is Date => date !== null,
-      );
+    const lastPracticeDate = user.streak?.lastPracticeDate;
+
+    const lastDay = lastPracticeDate
+      ? new Date(lastPracticeDate)
+      : null;
+
+    if (lastDay) {
+      lastDay.setUTCHours(0, 0, 0, 0);
+    }
+
+    const daysSinceLastPractice = lastDay
+      ? Math.round(
+          (today.getTime() - lastDay.getTime()) /
+            (24 * 60 * 60 * 1000),
+        )
+      : Infinity;
+
+    const streak =
+      daysSinceLastPractice >= 0 && daysSinceLastPractice <= 1
+        ? user.streak?.currentStreak ?? 0
+        : 0;
 
     return {
       userId: user.id,
       name: user.name?.trim() || "Anonymous",
-      streak: calculateCurrentStreak(
-        practiceDates,
-      ),
+      streak,
     };
   });
 
@@ -274,8 +255,6 @@ export async function getStreakLeaderboard(
       return b.streak - a.streak;
     }
 
-    // If streaks are equal, keep the
-    // ordering stable by user ID.
     return a.userId.localeCompare(b.userId);
   });
 

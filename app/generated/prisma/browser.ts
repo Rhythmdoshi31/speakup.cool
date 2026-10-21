@@ -32,3 +32,8 @@ export type PracticeSession = Prisma.PracticeSessionModel
  * 
  */
 export type SavedTopic = Prisma.SavedTopicModel
+/**
+ * Model UserStreak
+ * 
+ */
+export type UserStreak = Prisma.UserStreakModel

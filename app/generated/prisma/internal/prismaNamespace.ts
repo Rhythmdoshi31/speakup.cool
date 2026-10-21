@@ -399,7 +399,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   PracticeSession: 'PracticeSession',
-  SavedTopic: 'SavedTopic'
+  SavedTopic: 'SavedTopic',
+  UserStreak: 'UserStreak'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -415,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "practiceSession" | "savedTopic"
+    modelProps: "user" | "practiceSession" | "savedTopic" | "userStreak"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -641,6 +642,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    UserStreak: {
+      payload: Prisma.$UserStreakPayload<ExtArgs>
+      fields: Prisma.UserStreakFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserStreakFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStreakPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserStreakFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStreakPayload>
+        }
+        findFirst: {
+          args: Prisma.UserStreakFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStreakPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserStreakFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStreakPayload>
+        }
+        findMany: {
+          args: Prisma.UserStreakFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStreakPayload>[]
+        }
+        create: {
+          args: Prisma.UserStreakCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStreakPayload>
+        }
+        createMany: {
+          args: Prisma.UserStreakCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserStreakCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStreakPayload>[]
+        }
+        delete: {
+          args: Prisma.UserStreakDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStreakPayload>
+        }
+        update: {
+          args: Prisma.UserStreakUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStreakPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserStreakDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserStreakUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserStreakUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStreakPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserStreakUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserStreakPayload>
+        }
+        aggregate: {
+          args: Prisma.UserStreakAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserStreak>
+        }
+        groupBy: {
+          args: Prisma.UserStreakGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserStreakGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserStreakCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserStreakCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -715,6 +790,17 @@ export const SavedTopicScalarFieldEnum = {
 } as const
 
 export type SavedTopicScalarFieldEnum = (typeof SavedTopicScalarFieldEnum)[keyof typeof SavedTopicScalarFieldEnum]
+
+
+export const UserStreakScalarFieldEnum = {
+  userId: 'userId',
+  currentStreak: 'currentStreak',
+  longestStreak: 'longestStreak',
+  lastPracticeDate: 'lastPracticeDate',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserStreakScalarFieldEnum = (typeof UserStreakScalarFieldEnum)[keyof typeof UserStreakScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -956,6 +1042,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   practiceSession?: Prisma.PracticeSessionOmit
   savedTopic?: Prisma.SavedTopicOmit
+  userStreak?: Prisma.UserStreakOmit
 }
 
 /* Types for Logging */

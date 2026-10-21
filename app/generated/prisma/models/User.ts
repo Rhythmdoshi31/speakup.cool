@@ -192,6 +192,7 @@ export type UserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   practiceSessions?: Prisma.PracticeSessionListRelationFilter
   savedTopics?: Prisma.SavedTopicListRelationFilter
+  streak?: Prisma.XOR<Prisma.UserStreakNullableScalarRelationFilter, Prisma.UserStreakWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
@@ -203,6 +204,7 @@ export type UserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   practiceSessions?: Prisma.PracticeSessionOrderByRelationAggregateInput
   savedTopics?: Prisma.SavedTopicOrderByRelationAggregateInput
+  streak?: Prisma.UserStreakOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -217,6 +219,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   practiceSessions?: Prisma.PracticeSessionListRelationFilter
   savedTopics?: Prisma.SavedTopicListRelationFilter
+  streak?: Prisma.XOR<Prisma.UserStreakNullableScalarRelationFilter, Prisma.UserStreakWhereInput> | null
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -252,6 +255,7 @@ export type UserCreateInput = {
   updatedAt?: Date | string
   practiceSessions?: Prisma.PracticeSessionCreateNestedManyWithoutUserInput
   savedTopics?: Prisma.SavedTopicCreateNestedManyWithoutUserInput
+  streak?: Prisma.UserStreakCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -263,6 +267,7 @@ export type UserUncheckedCreateInput = {
   updatedAt?: Date | string
   practiceSessions?: Prisma.PracticeSessionUncheckedCreateNestedManyWithoutUserInput
   savedTopics?: Prisma.SavedTopicUncheckedCreateNestedManyWithoutUserInput
+  streak?: Prisma.UserStreakUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -274,6 +279,7 @@ export type UserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   practiceSessions?: Prisma.PracticeSessionUpdateManyWithoutUserNestedInput
   savedTopics?: Prisma.SavedTopicUpdateManyWithoutUserNestedInput
+  streak?: Prisma.UserStreakUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -285,6 +291,7 @@ export type UserUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   practiceSessions?: Prisma.PracticeSessionUncheckedUpdateManyWithoutUserNestedInput
   savedTopics?: Prisma.SavedTopicUncheckedUpdateManyWithoutUserNestedInput
+  streak?: Prisma.UserStreakUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -386,6 +393,20 @@ export type UserUpdateOneRequiredWithoutSavedTopicsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSavedTopicsInput, Prisma.UserUpdateWithoutSavedTopicsInput>, Prisma.UserUncheckedUpdateWithoutSavedTopicsInput>
 }
 
+export type UserCreateNestedOneWithoutStreakInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStreakInput, Prisma.UserUncheckedCreateWithoutStreakInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStreakInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutStreakNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStreakInput, Prisma.UserUncheckedCreateWithoutStreakInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStreakInput
+  upsert?: Prisma.UserUpsertWithoutStreakInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStreakInput, Prisma.UserUpdateWithoutStreakInput>, Prisma.UserUncheckedUpdateWithoutStreakInput>
+}
+
 export type UserCreateWithoutPracticeSessionsInput = {
   id: string
   email: string
@@ -394,6 +415,7 @@ export type UserCreateWithoutPracticeSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   savedTopics?: Prisma.SavedTopicCreateNestedManyWithoutUserInput
+  streak?: Prisma.UserStreakCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPracticeSessionsInput = {
@@ -404,6 +426,7 @@ export type UserUncheckedCreateWithoutPracticeSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   savedTopics?: Prisma.SavedTopicUncheckedCreateNestedManyWithoutUserInput
+  streak?: Prisma.UserStreakUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPracticeSessionsInput = {
@@ -430,6 +453,7 @@ export type UserUpdateWithoutPracticeSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   savedTopics?: Prisma.SavedTopicUpdateManyWithoutUserNestedInput
+  streak?: Prisma.UserStreakUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPracticeSessionsInput = {
@@ -440,6 +464,7 @@ export type UserUncheckedUpdateWithoutPracticeSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   savedTopics?: Prisma.SavedTopicUncheckedUpdateManyWithoutUserNestedInput
+  streak?: Prisma.UserStreakUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSavedTopicsInput = {
@@ -450,6 +475,7 @@ export type UserCreateWithoutSavedTopicsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   practiceSessions?: Prisma.PracticeSessionCreateNestedManyWithoutUserInput
+  streak?: Prisma.UserStreakCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSavedTopicsInput = {
@@ -460,6 +486,7 @@ export type UserUncheckedCreateWithoutSavedTopicsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   practiceSessions?: Prisma.PracticeSessionUncheckedCreateNestedManyWithoutUserInput
+  streak?: Prisma.UserStreakUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSavedTopicsInput = {
@@ -486,6 +513,7 @@ export type UserUpdateWithoutSavedTopicsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   practiceSessions?: Prisma.PracticeSessionUpdateManyWithoutUserNestedInput
+  streak?: Prisma.UserStreakUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedTopicsInput = {
@@ -496,6 +524,67 @@ export type UserUncheckedUpdateWithoutSavedTopicsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   practiceSessions?: Prisma.PracticeSessionUncheckedUpdateManyWithoutUserNestedInput
+  streak?: Prisma.UserStreakUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutStreakInput = {
+  id: string
+  email: string
+  name?: string | null
+  avatarUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  practiceSessions?: Prisma.PracticeSessionCreateNestedManyWithoutUserInput
+  savedTopics?: Prisma.SavedTopicCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutStreakInput = {
+  id: string
+  email: string
+  name?: string | null
+  avatarUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  practiceSessions?: Prisma.PracticeSessionUncheckedCreateNestedManyWithoutUserInput
+  savedTopics?: Prisma.SavedTopicUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutStreakInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutStreakInput, Prisma.UserUncheckedCreateWithoutStreakInput>
+}
+
+export type UserUpsertWithoutStreakInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutStreakInput, Prisma.UserUncheckedUpdateWithoutStreakInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutStreakInput, Prisma.UserUncheckedCreateWithoutStreakInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutStreakInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutStreakInput, Prisma.UserUncheckedUpdateWithoutStreakInput>
+}
+
+export type UserUpdateWithoutStreakInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  practiceSessions?: Prisma.PracticeSessionUpdateManyWithoutUserNestedInput
+  savedTopics?: Prisma.SavedTopicUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutStreakInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  practiceSessions?: Prisma.PracticeSessionUncheckedUpdateManyWithoutUserNestedInput
+  savedTopics?: Prisma.SavedTopicUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -547,6 +636,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   practiceSessions?: boolean | Prisma.User$practiceSessionsArgs<ExtArgs>
   savedTopics?: boolean | Prisma.User$savedTopicsArgs<ExtArgs>
+  streak?: boolean | Prisma.User$streakArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -581,6 +671,7 @@ export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   practiceSessions?: boolean | Prisma.User$practiceSessionsArgs<ExtArgs>
   savedTopics?: boolean | Prisma.User$savedTopicsArgs<ExtArgs>
+  streak?: boolean | Prisma.User$streakArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -591,6 +682,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     practiceSessions: Prisma.$PracticeSessionPayload<ExtArgs>[]
     savedTopics: Prisma.$SavedTopicPayload<ExtArgs>[]
+    streak: Prisma.$UserStreakPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -995,6 +1087,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   practiceSessions<T extends Prisma.User$practiceSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$practiceSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PracticeSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   savedTopics<T extends Prisma.User$savedTopicsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savedTopicsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedTopicPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  streak<T extends Prisma.User$streakArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$streakArgs<ExtArgs>>): Prisma.Prisma__UserStreakClient<runtime.Types.Result.GetResult<Prisma.$UserStreakPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1468,6 +1561,25 @@ export type User$savedTopicsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.SavedTopicScalarFieldEnum | Prisma.SavedTopicScalarFieldEnum[]
+}
+
+/**
+ * User.streak
+ */
+export type User$streakArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserStreak
+   */
+  select?: Prisma.UserStreakSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserStreak
+   */
+  omit?: Prisma.UserStreakOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserStreakInclude<ExtArgs> | null
+  where?: Prisma.UserStreakWhereInput
 }
 
 /**
