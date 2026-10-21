@@ -18,6 +18,8 @@ model User {
 
   practiceSessions PracticeSession[]
   savedTopics      SavedTopic[]
+
+  streak UserStreak?
 }
 
 model PracticeSession {
@@ -54,4 +56,14 @@ model SavedTopic {
 
   @@unique([userId, topic])
   @@index([userId])
+}
+
+model UserStreak {
+  userId           String   @id
+  currentStreak    Int      @default(0)
+  longestStreak    Int      @default(0)
+  lastPracticeDate DateTime? @db.Date
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
