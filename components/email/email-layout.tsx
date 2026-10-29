@@ -46,7 +46,7 @@ export default function EmailLayout({
         >
           <Section>
             <Img
-              src="https://speakup.cool/iconhd.png"
+              src="https://speakup.cool/icon.png"
               alt="SpeakUp"
               width="44"
               height="44"
