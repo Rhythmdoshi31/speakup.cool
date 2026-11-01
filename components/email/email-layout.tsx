@@ -4,12 +4,12 @@ import {
   Head,
   Heading,
   Html,
+  Img,
   Preview,
   Section,
   Text,
 } from "@react-email/components";
 import type { ReactNode } from "react";
-import { Img } from "@react-email/components";
 
 interface EmailLayoutProps {
   preview: string;
@@ -27,77 +27,70 @@ export default function EmailLayout({
       <Head />
       <Preview>{preview}</Preview>
 
-      <Body
-        style={{
-          backgroundColor: "#f5f5f5",
-          fontFamily: "Arial, Helvetica, sans-serif",
-          margin: 0,
-          padding: "32px 12px",
-        }}
-      >
-        <Container
-          style={{
-            backgroundColor: "#ffffff",
-            borderRadius: "16px",
-            maxWidth: "560px",
-            margin: "0 auto",
-            padding: "36px 28px",
-          }}
-        >
-          <Section>
-            <Img
-              src="https://speakup.cool/icon.png"
-              alt="SpeakUp"
-              width="44"
-              height="44"
-              style={{
-                display: "block",
-                marginBottom: "24px",
-                borderRadius: "10px",
-              }}
-            />
-
-            <Heading
-              as="h1"
-              style={{
-                fontSize: "25px",
-                lineHeight: "1.35",
-                color: "#171717",
-                margin: "0 0 18px",
-              }}
-            >
-              {title}
-            </Heading>
-
-            {children}
-          </Section>
-
+      <Body style={styles.body}>
+        <Container style={styles.container}>
           <Section
             style={{
-              borderTop: "1px solid #eeeeee",
-              marginTop: "32px",
-              paddingTop: "20px",
+              marginBottom: "32px",
             }}
           >
-            <Text
-              style={{
-                color: "#737373",
-                fontSize: "12px",
-                lineHeight: "1.6",
-                margin: 0,
-              }}
+            <table
+              cellPadding="0"
+              cellSpacing="0"
+              role="presentation"
+              style={{ borderCollapse: "collapse" }}
             >
-              SpeakUp — practice speaking, one session at a time.
-            </Text>
+              <tbody>
+                <tr>
+                  <td
+                    style={{
+                      verticalAlign: "middle",
+                      paddingRight: "8px",
+                    }}
+                  >
+                    <Img
+                      src="https://speakup.cool/icon.png"
+                      alt="SpeakUp"
+                      width="24"
+                      height="24"
+                      style={{
+                        display: "block",
+                        width: "24px",
+                        height: "24px",
+                        objectFit: "contain",
+                      }}
+                    />
+                  </td>
+                  <td style={{ verticalAlign: "middle" }}>
+                    <Text
+                      style={{
+                        margin: 0,
+                        color: "#222222",
+                        fontSize: "16px",
+                        fontWeight: 600,
+                        lineHeight: "24px",
+                      }}
+                    >
+                      SpeakUp
+                    </Text>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </Section>
 
-            <Text
-              style={{
-                color: "#737373",
-                fontSize: "12px",
-                marginBottom: 0,
-              }}
-            >
-              <a href="https://speakup.cool" style={{ color: "#525252" }}>
+          <Heading as="h1" style={styles.heading}>
+            {title}
+          </Heading>
+
+          {children}
+
+          <Section style={styles.footer}>
+            <Text style={styles.footerText}>
+              SpeakUp · Practice speaking, one session at a time.
+            </Text>
+            <Text style={styles.footerText}>
+              <a href="https://speakup.cool" style={styles.footerLink}>
                 speakup.cool
               </a>
             </Text>
@@ -107,3 +100,56 @@ export default function EmailLayout({
     </Html>
   );
 }
+
+const styles = {
+  body: {
+    backgroundColor: "#ffffff",
+    color: "#222222",
+    fontFamily: "Arial, Helvetica, sans-serif",
+    margin: "0 auto",
+    padding: "24px 16px",
+  },
+  container: {
+    maxWidth: "520px",
+    margin: "0 auto",
+  },
+  header: {
+    display: "flex",
+    alignItems: "center",
+    marginBottom: "36px",
+  },
+  logo: {
+    display: "inline-block",
+    objectFit: "contain" as const,
+    marginRight: "8px",
+  },
+  brand: {
+    display: "inline-block",
+    fontSize: "15px",
+    fontWeight: "600",
+    margin: "0",
+  },
+  heading: {
+    color: "#222222",
+    fontSize: "25px",
+    fontWeight: "600",
+    lineHeight: "1.35",
+    letterSpacing: "-0.5px",
+    margin: "0 0 24px",
+  },
+  footer: {
+    borderTop: "1px solid #eeeeee",
+    marginTop: "36px",
+    paddingTop: "16px",
+  },
+  footerText: {
+    color: "#888888",
+    fontSize: "12px",
+    lineHeight: "1.6",
+    margin: "4px 0",
+  },
+  footerLink: {
+    color: "#666666",
+    textDecoration: "none",
+  },
+};

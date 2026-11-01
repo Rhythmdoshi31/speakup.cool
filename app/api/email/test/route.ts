@@ -28,10 +28,8 @@ export async function POST(request: NextRequest) {
   try {
     const result = await sendEmail({
       to: recipient,
-      subject: "Your SpeakUp email test",
-      react: React.createElement(InactivityReminder, {
-        name: "there",
-      }),
+      subject: "You were here early. Here's what's next.",
+      react: React.createElement(InactivityReminder, {}),
     });
 
     return NextResponse.json({
