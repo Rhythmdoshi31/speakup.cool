@@ -143,7 +143,7 @@ export default function Navbar({ streakRefreshKey = 0 }: NavbarProps) {
           "
         >
           <ArrowLeft size={17} strokeWidth={2} />
-          <span>Back</span>
+          <span className="hidden sm:inline">Back</span>
         </Link>
       )}
 
